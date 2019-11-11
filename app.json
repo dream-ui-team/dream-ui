@@ -1,20 +1,4 @@
 {
-<<<<<<< HEAD
-  "addons": [
-
-  ],
-  "buildpacks": [
-
-  ],
-  "env": {
-  },
-  "formation": {
-  },
-  "name": "dream-ui",
-  "scripts": {
-  },
-  "stack": "heroku-18"
-=======
   "expo": {
     "name": "dream-ui",
     "slug": "dream-ui",
@@ -43,5 +27,4 @@
       "supportsTablet": true
     }
   }
->>>>>>> b36a9099d4fe84d838c7c58e4c6e963b49722300
 }
