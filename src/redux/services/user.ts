@@ -18,22 +18,44 @@ export function fetchImageService(page?: number, limit?: number) {
 }
 
 export function loginUserService(username: string, password: string) {
-  return new Promise((resolve, reject) => {
-    fetch(`${urls.Base}users/login?userName=${encodeURIComponent(`${username}`)}&password=${encodeURIComponent(`${password}`)}`,{
-      method:'GET',
-      headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      }).then(res => res.json())
-        .then(response => {
-          resolve(response);
-        })    
-        .catch(error => {
-          Alert.alert("Login unSuccess");
-          reject(error);
-        });
-
+  // return new Promise((resolve, reject) => {
+  //   fetch(`${urls.Base}users/login?mobileNum=${encodeURIComponent(`${username}`)}&password=${encodeURIComponent(`${password}`)}`,{
+  //     method:'GET',
+  //     headers: {
+  //         Accept: 'application/json',
+  //         'Content-Type': 'application/json',
+  //         'Access-Control-Allow-Origin':'*',
+  //         'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
+  //         'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
+  //         'Sec-Fetch-Mode': 'no-cors'
+  //       },
+  //     }).then(res => res.json())
+  //       .then(response => {
+  //         resolve(response);
+  //       })    
+  //       .catch(error => {
+  //         Alert.alert("Login unSuccess");
+  //         reject(error);
+  //       });
+  //     });
+        return fetch(`${urls.Base}users/login?mobileNum=${encodeURIComponent(`${username}`)}&password=${encodeURIComponent(`${password}`)}`,{
+            method:'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin':'*',
+                'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
+                'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
+                'Sec-Fetch-Mode': 'no-cors'
+              },
+            }).then(res => res.json())
+              .then(response => {
+                return response
+              })    
+              .catch(error => {
+                Alert.alert(error);
+                
+              });
 
 
 
@@ -45,7 +67,6 @@ export function loginUserService(username: string, password: string) {
   //     .catch(error => {
   //       reject(error);
   //     });
-   });
 }
 
 export function logoutUserService() {
