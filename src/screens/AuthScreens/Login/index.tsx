@@ -47,12 +47,12 @@ class Login extends Component<Props, {}> {
   handleLogin = (values: userData) => {
     const { navigation } = this.props;
     loginUserService(values.username, values.password).then(res => {
-      if(res["errorCode"]!=undefined && res["errorCode"]=="20000"){
-        Alert.alert(res['errorMessage']);
-      }else{
+      if(res["errorCode"]==undefined || res["errorCode"]==""){
         let userToken = `${values.username}${values.password}`;
         AsyncStorage.setItem("userToken", userToken)
         navigation.navigate("AppStack");
+      }else{
+        Alert.alert(res["errorMessage"]);
       }
         
     });
@@ -71,7 +71,7 @@ class Login extends Component<Props, {}> {
               onSubmit={values => this.handleLogin(values)}
             >
               {props => {
-                console.log(props, "fdsfsdfdsf");
+       
                 return (
                   <View>
                     <View style={styles.headStyle}>
