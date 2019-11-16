@@ -102,9 +102,6 @@ class Login extends Component<Props, {}> {
                       <Button text="Login" onPress={props.handleSubmit} />
                       <Button text="Sign up" onPress={ () => this.props.navigation.navigate("RegistrationStack")} />
                     </View>
-                    <View>
-
-                    </View>
                   </View>
                 );
               }}

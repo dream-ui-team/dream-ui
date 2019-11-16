@@ -32,7 +32,7 @@ export function loginUserService(username: string, password: string) {
   //     }).then(res => res.json())
   //       .then(response => {
   //         resolve(response);
-  //       })    
+  //       })
   //       .catch(error => {
   //         Alert.alert("Login unSuccess");
   //         reject(error);
@@ -51,22 +51,36 @@ export function loginUserService(username: string, password: string) {
             }).then(res => res.json())
               .then(response => {
                 return response
-              })    
+              })
               .catch(error => {
                 Alert.alert(error);
-                
+
               });
+}
+export function userRegistrationService(mobileNum: string, password: string,firstName:string,lastName:string,email:string) {
 
+  console.log(`${firstName}`);
+  return fetch(`${urls.Base}/users`,{
+        method:'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+		  body: JSON.stringify({
+			emailAddress:email,
+			firstName:firstName,
+			lastName:lastName,
+			mobileNumber:mobileNum,
+			password:password,
+			exists:true
+		  })
+}).then(res => res.json())
+  .then(response => {
+    return response
+  }).catch(error => {
+    Alert.alert(error);
 
-
-  //   let userToken = `${username}${password}`;
-  //   AsyncStorage.setItem("userToken", userToken)
-  //     .then(() => {
-  //       resolve(userToken);
-  //     })
-  //     .catch(error => {
-  //       reject(error);
-  //     });
+  });
 }
 
 export function logoutUserService() {

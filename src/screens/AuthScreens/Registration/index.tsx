@@ -10,7 +10,7 @@ import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import Icon from "react-native-vector-icons/SimpleLineIcons";
-import { loginUserService } from "../../../redux/services/user";
+import { userRegistrationService } from "../../../redux/services/user";
 import { Input, Button } from "../../../components";
 import styles from "./styles";
 import { Alert, AsyncStorage } from "react-native";
@@ -28,39 +28,40 @@ interface userData {
 }
 
 const loginSchema = Yup.object().shape({
-  username: Yup.string()
+  email: Yup.string()
     .matches(/^[0-9]+$/)
     .min(10)
     .max(10)
-    .required(),
-  password: Yup.string()
-    .matches(/^[a-zA-Z0-9]+(\s?[a-zA-z0-9]+)*$/)
-    .min(6)
-    .max(16)
     .required()
 });
 
 class Registration extends Component<Props, {}> {
 
-  isValidCredentials= function(){
-    let isValid = AsyncStorage.getItem("userToken");
-    return isValid != undefined
-  }
+
 
   handleRegistration = (values: userData) => {
     const { navigation } = this.props;
-    Alert.alert("Hey I am here with `${values.firstName}`")
-    // loginUserService(values.username, values.password).then(res => {
-    //   if(res["errorCode"]==undefined || res["errorCode"]==""){
-    //     let userToken = `${values.username}${values.password}`;
-    //     AsyncStorage.setItem("userToken", userToken)
-    //     navigation.navigate("AppStack");
-    //   }else{
-    //     Alert.alert(res["errorMessage"]);
-    //   }
-    //
-    // });
-  };
+
+     userRegistrationService(values.mobileNum, values.password,values.firstName,values.lastName,values.email).then(res => {
+         //console.log("in Registration output",res);
+           if(res["errorCode"]==undefined || res["errorCode"]==""){
+             // Alert.alert(
+             //    'Registration Successful',
+             //    'Plese relogin',
+             //    [
+             //      {text: 'OK', onPress: () => console.log('OK Pressed')},
+             //    ],
+             //    {cancelable: false},
+             //  );
+             console.log("Registration successful");
+              navigation.navigate("AuthStack");
+
+            }else if(res["errorCode"]==20003 || res["errorCode"]==20004 )
+              Alert.alert(res["errorMessage"]);
+            }
+   });
+
+  }
 
   render() {
 
@@ -71,8 +72,8 @@ class Registration extends Component<Props, {}> {
         >
           <ScrollView bounces={false}>
             <Formik
-              initialValues={{ firstName: "", lastName:"", email:"", mobileNum:"", password: "" }}
-              validationSchema={loginSchema}
+              initialValues={{ firstName: "", lastName:"", email:"", mobileNum:"",password:"" }}
+              //validationSchema={loginSchema}
               onSubmit={values => this.handleRegistration(values)}
             >
               { props => {
@@ -88,28 +89,28 @@ class Registration extends Component<Props, {}> {
                       <Input
                         placeholder="First name"
                         value={props.values.firstName}
-                        //onChangeText={props.handleChange("firstName")}
+                        onChangeText={props.handleChange("firstName")}
                         //onBlur={props.handleBlur("firstName")}
                         error={props.touched.firstName && props.errors.firstName}
                       />
                       <Input
                         placeholder="Last name"
                         value={props.values.lastName}
-                        //onChangeText={props.handleChange("lastName")}
+                        onChangeText={props.handleChange("lastName")}
                        //onBlur={props.handleBlur("lastName")}
                         error={props.touched.lastName && props.errors.lastName}
                       />
                       <Input
                         placeholder="Email"
                         value={props.values.email}
-                        //onChangeText={props.handleChange("email")}
+                        onChangeText={props.handleChange("email")}
                         //onBlur={props.handleBlur("email")}
                         error={props.touched.email && props.errors.email}
                       />
                       <Input
                         placeholder="Mobille number"
                         value={props.values.mobileNum}
-                        //onChangeText={props.handleChange("mobileNum")}
+                        onChangeText={props.handleChange("mobileNum")}
                         //onBlur={props.handleBlur("mobileNum")}
                         error={props.touched.mobileNum && props.errors.mobileNum}
                       />
