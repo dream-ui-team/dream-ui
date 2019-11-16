@@ -12,6 +12,7 @@ import Blank from "../screens/AppScreens/Blank";
 import SideBar from "../screens/AppScreens/SideBar";
 import Login from "../screens/AuthScreens/Login";
 import AuthLoading from "../screens/AuthLoading";
+import Registration from "../screens/AuthScreens/Registration";
 
 const MainStack = createStackNavigator(
   {
@@ -33,6 +34,16 @@ const AuthStack = createStackNavigator(
   }
 );
 
+const RegistrationStack = createStackNavigator(
+  {
+    Registration: { screen: Registration }
+  },
+  {
+    initialRouteName: "Registration",
+    headerMode: "none"
+  }
+);
+
 const AppStack = createDrawerNavigator(
   {
     MainStack: { screen: MainStack },
@@ -50,7 +61,9 @@ export default createAppContainer(
     {
       AuthLoading: AuthLoading,
       AuthStack: AuthStack,
+      RegistrationStack: RegistrationStack,
       AppStack: AppStack
+
     },
     {
       initialRouteName: "AuthLoading"

@@ -19,6 +19,7 @@ import { Alert, AsyncStorage } from "react-native";
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
 }
+
 interface userData {
   username: string;
   password: string;
@@ -53,12 +54,14 @@ class Login extends Component<Props, {}> {
         navigation.navigate("AppStack");
       }else{
         Alert.alert(res["errorMessage"]);
+        navigation.navigate("RegistrationStack");
       }
-        
+
     });
   };
 
   render() {
+  //  const { navigation } = this.props;
     return (
       <View style={styles.container}>
         <KeyboardAvoidingView
@@ -71,7 +74,7 @@ class Login extends Component<Props, {}> {
               onSubmit={values => this.handleLogin(values)}
             >
               {props => {
-       
+
                 return (
                   <View>
                     <View style={styles.headStyle}>
@@ -97,6 +100,7 @@ class Login extends Component<Props, {}> {
                         error={props.touched.password && props.errors.password}
                       />
                       <Button text="Login" onPress={props.handleSubmit} />
+                      <Button text="Sign up" onPress={ () => this.props.navigation.navigate("RegistrationStack")} />
                     </View>
                     <View>
 
