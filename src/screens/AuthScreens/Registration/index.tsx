@@ -57,7 +57,15 @@ class Registration extends Component<Props, {}> {
               navigation.navigate("AuthStack");
 
             }else if(res["errorCode"]==20003 || res["errorCode"]==20004 )
+            {
+              console.log("user already exists with email or mobileNum");
+              navigation.navigate("AuthStack");
               Alert.alert(res["errorMessage"]);
+            }
+            else
+            {
+                console.log("user already exists with email");
+                Alert.alert(res["errorMessage"]);
             }
    });
 

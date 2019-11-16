@@ -76,9 +76,11 @@ export function userRegistrationService(mobileNum: string, password: string,firs
 		  })
 }).then(res => res.json())
   .then(response => {
+    console.log("reponse occurred");
     return response
   }).catch(error => {
-    Alert.alert(error);
+    console.log(res);
+    console.log("error occurred");
 
   });
 }
