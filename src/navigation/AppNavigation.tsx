@@ -66,8 +66,7 @@ export default createAppContainer(
       AuthStack: AuthStack,
       RegistrationStack: RegistrationStack,
       AppStack: AppStack,
-      AddressDetails: { screen: AddressDetails}
-
+      AddressDetails: { screen: AddressDetails }
     },
     {
       initialRouteName: "AuthLoading"

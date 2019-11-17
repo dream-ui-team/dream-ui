@@ -24,21 +24,22 @@ class AccountDetails extends Component<Props, {}> {
 
   render() {
     return (
+
       <View style={styles.container}>
         <TouchableOpacity
-          style={styles.button}
+          style={styles.ProfileButton}
           onPress={this.onPress}
         >
           <Text> My profile </Text>
         </TouchableOpacity>
+         <TouchableOpacity
+           style={styles.AddressButton}
+           onPress={ () => this.props.navigation.navigate("AddressDetails")}
+         >
+           <Text> My address </Text>
+         </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={ () => this.props.navigation.navigate("AddressDetails")}
-        >
-          <Text> My address </Text>
-        </TouchableOpacity>
-       </View>
      )
    }
  }
@@ -46,20 +47,18 @@ class AccountDetails extends Component<Props, {}> {
  const styles = StyleSheet.create({
    container: {
      flex: 1,
-     justifyContent: 'center',
+     justifyContent: 'top',
      paddingHorizontal: 10
    },
-   button: {
+   AddressButton: {
      alignItems: 'center',
-     backgroundColor: '#DDDDDD',
+     backgroundColor: 'skyblue',
      padding: 10
    },
-   countContainer: {
+   ProfileButton: {
      alignItems: 'center',
+     backgroundColor: 'powderblue',
      padding: 10
-   },
-   countText: {
-     color: '#FF00FF'
    }
  })
 
