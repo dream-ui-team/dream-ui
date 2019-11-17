@@ -9,6 +9,7 @@ const { width } = Dimensions.get("window");
 
 import Home from "../screens/AppScreens/Home";
 import Blank from "../screens/AppScreens/Blank";
+import ProfileDetails from "../screens/AppScreens/ProfileDetails";
 import SideBar from "../screens/AppScreens/SideBar";
 import Login from "../screens/AuthScreens/Login";
 import AuthLoading from "../screens/AuthLoading";
@@ -47,6 +48,7 @@ const RegistrationStack = createStackNavigator(
 const AppStack = createDrawerNavigator(
   {
     MainStack: { screen: MainStack },
+    ProfileDetails:{screen:ProfileDetails},
     Blank: { screen: Blank }
   },
   {

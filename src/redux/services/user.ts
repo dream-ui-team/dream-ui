@@ -85,6 +85,24 @@ export function userRegistrationService(mobileNum: string, password: string,firs
   });
 }
 
+export function getUserAddressService(userId:String) {
+  return fetch(`${urls.Base}/users/${userId}/addresses`,{
+      method:'GET',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        }
+}).then(res => res.json())
+  .then(response => {
+    console.log("reponse occurred");
+    return response
+  }).catch(error => {
+    console.log(res);
+    console.log("error occurred");
+
+  });
+}
+
 export function logoutUserService() {
   return new Promise((resolve, reject) => {
     AsyncStorage.removeItem("userToken")

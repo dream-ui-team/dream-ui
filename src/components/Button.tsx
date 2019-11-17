@@ -25,10 +25,10 @@ export class Button extends Component<Props, {}> {
 const styles = StyleSheet.create({
   buttonStyle: {
     backgroundColor: colors.primary,
-    height: 45,
+    height: 40,
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 16
+    marginVertical: 16,
   },
   buttonTextStyle: {
     color: colors.containerBg,

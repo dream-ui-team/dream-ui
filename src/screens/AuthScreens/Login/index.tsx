@@ -42,6 +42,7 @@ class Login extends Component<Props, {}> {
 
   isValidCredentials= function(){
     let isValid = AsyncStorage.getItem("userToken");
+    console.log("****"+isValid);
     return isValid != undefined
   }
 
@@ -49,8 +50,8 @@ class Login extends Component<Props, {}> {
     const { navigation } = this.props;
     loginUserService(values.username, values.password).then(res => {
       if(res["errorCode"]==undefined || res["errorCode"]==""){
-        let userToken = `${values.username}${values.password}`;
-        AsyncStorage.setItem("userToken", userToken)
+        //let userToken = `${values.username}${values.password}`;
+        AsyncStorage.setItem("userToken",  JSON.stringify(res));
         navigation.navigate("AppStack");
       }else{
         Alert.alert(res["errorMessage"]);
