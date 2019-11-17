@@ -45,16 +45,16 @@ class Registration extends Component<Props, {}> {
      userRegistrationService(values.mobileNum, values.password,values.firstName,values.lastName,values.email).then(res => {
          //console.log("in Registration output",res);
            if(res["errorCode"]==undefined || res["errorCode"]==""){
-             // Alert.alert(
-             //    'Registration Successful',
-             //    'Plese relogin',
-             //    [
-             //      {text: 'OK', onPress: () => console.log('OK Pressed')},
-             //    ],
-             //    {cancelable: false},
-             //  );
-             console.log("Registration successful");
-              navigation.navigate("AuthStack");
+           //    Alert.alert(
+           //      'Registration Successful',
+           //      'Plese relogin',
+           //      [
+           //        {text: 'OK', onPress: () => console.log('OK Pressed')},
+           //      ],
+           //      {cancelable: false},
+           //  );
+            console.log("Registration successful");
+            navigation.navigate("AuthStack");
 
             }else if(res["errorCode"]==20003 || res["errorCode"]==20004 )
             {
@@ -131,6 +131,7 @@ class Registration extends Component<Props, {}> {
                         error={props.touched.password && props.errors.password}
                       />
                       <Button text="Sign up" onPress={props.handleSubmit} />
+                      <Button text="Login" onPress={ () => this.props.navigation.navigate("AuthStack")} />
                     </View>
                   </View>
                 );

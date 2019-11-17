@@ -55,7 +55,7 @@ class Login extends Component<Props, {}> {
         navigation.navigate("AppStack");
       }else{
         Alert.alert(res["errorMessage"]);
-        navigation.navigate("RegistrationStack");
+        //navigation.navigate("RegistrationStack");
       }
 
     });
@@ -78,12 +78,14 @@ class Login extends Component<Props, {}> {
 
                 return (
                   <View>
-                    <View style={styles.headStyle}>
+
+                    <View  style={styles.headStyle}>
                       <Icon name="emotsmile" size={100} />
                       <Text style={styles.headText}>
                         Build Something Amazing
                       </Text>
                     </View>
+
                     <View style={styles.inputContainer}>
                       <Input
                         placeholder="Username"
@@ -103,6 +105,7 @@ class Login extends Component<Props, {}> {
                       <Button text="Login" onPress={props.handleSubmit} />
                       <Button text="Sign up" onPress={ () => this.props.navigation.navigate("RegistrationStack")} />
                     </View>
+
                   </View>
                 );
               }}
