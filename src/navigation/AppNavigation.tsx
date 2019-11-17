@@ -9,11 +9,12 @@ const { width } = Dimensions.get("window");
 
 import Home from "../screens/AppScreens/Home";
 import Blank from "../screens/AppScreens/Blank";
-import ProfileDetails from "../screens/AppScreens/ProfileDetails";
+import AddressDetails from "../screens/AppScreens/AddressDetails";
 import SideBar from "../screens/AppScreens/SideBar";
 import Login from "../screens/AuthScreens/Login";
 import AuthLoading from "../screens/AuthLoading";
 import Registration from "../screens/AuthScreens/Registration";
+import AccountDetails from "../screens/AppScreens/AccountDetails";
 
 const MainStack = createStackNavigator(
   {
@@ -48,7 +49,7 @@ const RegistrationStack = createStackNavigator(
 const AppStack = createDrawerNavigator(
   {
     MainStack: { screen: MainStack },
-    ProfileDetails:{screen:ProfileDetails},
+    AccountDetails: {screen: AccountDetails},
     Blank: { screen: Blank }
   },
   {
@@ -64,7 +65,8 @@ export default createAppContainer(
       AuthLoading: AuthLoading,
       AuthStack: AuthStack,
       RegistrationStack: RegistrationStack,
-      AppStack: AppStack
+      AppStack: AppStack,
+      AddressDetails: { screen: AddressDetails}
 
     },
     {

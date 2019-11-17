@@ -16,7 +16,7 @@ interface itemProp {
   item: any;
 }
 
-class ProfileDetails extends Component<Props, State> {
+class AddressDetails extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -122,4 +122,4 @@ ButtonContainer:
 }
 
 });
-export default ProfileDetails;
+export default AddressDetails;

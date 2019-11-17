@@ -30,8 +30,8 @@ class SideBar extends Component<Props, {}> {
         </ListItem>
         <ListItem title="Home" onPress={() => navigation.navigate("Home")} />
         <ListItem
-          title="Profile Details"
-          onPress={() => navigation.navigate("ProfileDetails")}/>
+          title="Account Details"
+          onPress={() => navigation.navigate("AccountDetails")}/>
         <ListItem
           title="Blank Page"
           onPress={() => navigation.navigate("Blank")}
