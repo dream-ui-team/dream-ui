@@ -33,6 +33,10 @@ class SideBar extends Component<Props, {}> {
           title="Account Details"
           onPress={() => navigation.navigate("AccountDetails")}/>
         <ListItem
+          title="My Vehicles"
+          onPress={() => navigation.navigate("VehicleDetails")}
+        />
+        <ListItem
           title="Blank Page"
           onPress={() => navigation.navigate("Blank")}
         />

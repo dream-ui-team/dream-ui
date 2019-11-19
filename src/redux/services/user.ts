@@ -103,6 +103,23 @@ export function getUserAddressService(userId:String) {
   });
 }
 
+
+export function getUserVehicles(userId:String) {
+  return fetch(`${urls.Base}/users/vehicles?userId=${userId}`,{
+          method:'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          }
+        }).then(res => res.json())
+          .then(response => {
+            console.log("reponse occurred");
+            return response
+          }).catch(error => {
+            console.log("error occurred");
+        });
+}
+
 export function logoutUserService() {
   return new Promise((resolve, reject) => {
     AsyncStorage.removeItem("userToken")
