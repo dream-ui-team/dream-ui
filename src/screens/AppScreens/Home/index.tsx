@@ -60,26 +60,6 @@ class Home extends Component<Props, State> {
           leftButtonPress={() => navigation.openDrawer()}
           rightButtonPress={() => this.handleLogout()}
         />
-        <FlatList
-          data={imageData}
-          keyExtractor={item => item.id}
-          renderItem={({ item }: itemProp) => {
-            return (
-              <AvatarItem avatar={item.download_url} title={item.author} />
-            );
-          }}
-          onEndReached={() => {
-            this.setState({ page: page + 1 });
-            fetchMoreImageData(page + 1, limit);
-          }}
-          ListFooterComponent={
-            loading ? (
-              <View style={styles.loadingFooter}>
-                <ActivityIndicator />
-              </View>
-            ) : null
-          }
-        />
       </View>
     );
   }
