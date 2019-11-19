@@ -15,6 +15,7 @@ import Login from "../screens/AuthScreens/Login";
 import AuthLoading from "../screens/AuthLoading";
 import Registration from "../screens/AuthScreens/Registration";
 import AccountDetails from "../screens/AppScreens/AccountDetails";
+import MyProfileDetails from "../screens/AppScreens/MyProfileDetails";
 
 const MainStack = createStackNavigator(
   {
@@ -46,6 +47,16 @@ const RegistrationStack = createStackNavigator(
   }
 );
 
+const MyProfileDetailsStack = createStackNavigator(
+  {
+    MyProfileDetails: { screen: MyProfileDetails }
+  },
+  {
+    initialRouteName: "MyProfileDetails",
+    headerMode: "none"
+  }
+);
+
 const AppStack = createDrawerNavigator(
   {
     MainStack: { screen: MainStack },
@@ -65,6 +76,7 @@ export default createAppContainer(
       AuthLoading: AuthLoading,
       AuthStack: AuthStack,
       RegistrationStack: RegistrationStack,
+      MyProfileDetails: MyProfileDetails,
       AppStack: AppStack,
       AddressDetails: { screen: AddressDetails }
     },

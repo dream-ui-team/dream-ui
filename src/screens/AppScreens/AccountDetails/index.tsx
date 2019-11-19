@@ -20,7 +20,24 @@ interface Props {
   navigation: NavigationScreenProp<NavigationState>;
 }
 
+
 class AccountDetails extends Component<Props, {}> {
+
+  constructor(props) {
+    // 
+    super(props);
+    this.state = {
+       values : []
+     }
+  }
+
+  componentDidMount() {
+    AsyncStorage.getItem('userToken').then((value) =>{
+      this.setState({values:JSON.parse(value)});
+      }).then(res => {
+        console.log("values are:"+this.state.values.firstName)
+      });
+  }
 
   render() {
     return (
@@ -28,7 +45,7 @@ class AccountDetails extends Component<Props, {}> {
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.ProfileButton}
-          onPress={this.onPress}
+          onPress={ () => this.props.navigation.navigate("MyProfileDetails",{values:this.state.values})}
         >
           <Text> My profile </Text>
         </TouchableOpacity>
@@ -47,7 +64,7 @@ class AccountDetails extends Component<Props, {}> {
  const styles = StyleSheet.create({
    container: {
      flex: 1,
-     justifyContent: 'top',
+     justifyContent: 'flex-start',
      paddingHorizontal: 10
    },
    AddressButton: {
