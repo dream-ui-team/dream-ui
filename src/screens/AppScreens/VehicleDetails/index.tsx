@@ -4,7 +4,7 @@ import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { connect } from "react-redux";
 import { Header } from "../../../components";
 import styles from "./styles";
-import { AvatarItem,Input, Button } from "../../../components";
+import { AvatarItem,Input, CommonButton } from "../../../components";
 import { logoutUserService,getUserVehicles } from "../../../redux/services/user";
 import {NavigationEvents} from 'react-navigation';
 import AwesomeButton from "react-native-really-awesome-button";
@@ -30,20 +30,45 @@ class VehicleDetails extends Component<Props, State> {
 
   componentDidMount() {
     console.log("mounted");
-    AsyncStorage.getItem('userToken').then((value) =>{
-        this.setState({values:JSON.parse(value)});
-        }).then(res => {
-          console.log(this.state.values.userId);
-          getUserVehicles(this.state.values.userId)
-            .then(res =>{
-                    this.setState({ vehicles: res });
-                    console.log(this.state.vehicles[0].manufacturerName);
-                  })
-            .catch(console.log)
-        });
+    let values= 
+      [
+        {
+      'model':'Maruti Swift Dezire',
+      'registrationNumber':'5645646',
+      'manufacturerName': 'Maruti',
+      'vehicleTypeCode': 2
+        }
+      ]
+    
+    this.setState({ vehicles: values });
+   // this.setState({values:values});
+    // AsyncStorage.getItem('userToken').then((value) =>{
+    //     this.setState({values:JSON.parse(value)});
+    //     }).then(res => {
+    //       console.log(this.state.values.userId);
+    //       getUserVehicles(this.state.values.userId)
+    //         .then(res =>{
+    //                 this.setState({ vehicles: res });
+    //                 console.log(this.state.vehicles[0].manufacturerName);
+    //               })
+    //         .catch(console.log)
+    //     });
   }
 
   handleLogout = () => {
+    const { navigation } = this.props;
+    logoutUserService().then(() => {
+      navigation.navigate("AuthStack");
+    });
+  };
+
+  handleUpdate = () => {
+    const { navigation } = this.props;
+    logoutUserService().then(() => {
+      navigation.navigate("AuthStack");
+    });
+  };
+  handleDelete = () => {
     const { navigation } = this.props;
     logoutUserService().then(() => {
       navigation.navigate("AuthStack");
@@ -70,13 +95,11 @@ class VehicleDetails extends Component<Props, State> {
                 <Text>Registration Nr: {item.registrationNumber}</Text>
                 <Text>Manufacturer: {item.manufacturerName}</Text>
                 <Text>Type: {item.vehicleTypeCode}</Text>
-               
-                <View style={styles1.buttonContainer}>
-                  <AwesomeButton><Text>UPDATE</Text></AwesomeButton>
-                  <AwesomeButton><Text>DELETE</Text></AwesomeButton>
-                </View>
-              
 		        </View>
+            <View style={styles1.buttonContainer}>
+              <View style={{width: 50, height: 50}} ><CommonButton text="Update" onPress={() => this.handleUpdate()}/></View>
+              <View style={{width: 50, height: 50}}><CommonButton text="Delete" onPress={() => this.handleDelete()}/></View>
+            </View>
           </View>
               }
         />
@@ -127,11 +150,7 @@ item_separator:
 },
 ButtonContainer:
 {
-  flex: 1,
-  flexDirection: 'row',
-  width: '30%',
-  height: 40,
-  justifyContent: 'space-between',
+  flex: 1
 }
 
 });
