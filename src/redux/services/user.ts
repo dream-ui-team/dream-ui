@@ -18,45 +18,26 @@ export function fetchImageService(page?: number, limit?: number) {
 }
 
 export function loginUserService(username: string, password: string) {
-  // return new Promise((resolve, reject) => {
-  //   fetch(`${urls.Base}users/login?mobileNum=${encodeURIComponent(`${username}`)}&password=${encodeURIComponent(`${password}`)}`,{
-  //     method:'GET',
-  //     headers: {
-  //         Accept: 'application/json',
-  //         'Content-Type': 'application/json',
-  //         'Access-Control-Allow-Origin':'*',
-  //         'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
-  //         'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
-  //         'Sec-Fetch-Mode': 'no-cors'
-  //       },
-  //     }).then(res => res.json())
-  //       .then(response => {
-  //         resolve(response);
-  //       })
-  //       .catch(error => {
-  //         Alert.alert("Login unSuccess");
-  //         reject(error);
-  //       });
-  //     });
-        return fetch(`${urls.Base}users/login?mobileNum=${encodeURIComponent(`${username}`)}&password=${encodeURIComponent(`${password}`)}`,{
-            method:'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin':'*',
-                'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
-                'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
-                'Sec-Fetch-Mode': 'no-cors'
-              },
-            }).then(res => res.json())
-              .then(response => {
-                return response
-              })
-              .catch(error => {
-                Alert.alert(error);
+    return fetch(`${urls.Base}users/login?mobileNum=${encodeURIComponent(`${username}`)}&password=${encodeURIComponent(`${password}`)}`,{
+        method:'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin':'*',
+            'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
+            'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
+            'Sec-Fetch-Mode': 'no-cors'
+          },
+        }).then(res => res.json())
+          .then(response => {
+            return response
+          })
+          .catch(error => {
+            Alert.alert(error);
 
-              });
+          });
 }
+
 export function userRegistrationService(mobileNum: string, password: string,firstName:string,lastName:string,email:string) {
 
   console.log(`${firstName}`);
@@ -81,7 +62,6 @@ export function userRegistrationService(mobileNum: string, password: string,firs
   }).catch(error => {
     console.log(res);
     console.log("error occurred");
-
   });
 }
 
@@ -101,6 +81,48 @@ export function getUserAddressService(userId:String) {
     console.log("error occurred");
 
   });
+}
+
+
+export function getUserVehicles(userId:String) {
+  return fetch(`${urls.Base}/users/vehicles?userId=${userId}`,{
+          method:'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          }
+        }).then(res => res.json())
+          .then(response => {
+            console.log("reponse occurred");
+            return response
+          }).catch(error => {
+            console.log("error occurred");
+        });
+}
+
+export function updateUserProfile(userId: string, mobileNumber: string, firstName:string, lastName:string, emailAddress:string) {
+  console.log(`${firstName}`);
+  return fetch(`${urls.Base}/users`,{
+        method:'PUT',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+      body: JSON.stringify({
+      userId:userId,
+      emailAddress:emailAddress,
+      firstName:firstName,
+      lastName:lastName,
+      mobileNumber:mobileNumber
+      })
+    }).then(res => res.json())
+        .then(response => {
+             console.log("reponse occurred");
+             return response
+        }).catch(error => {
+                console.log(error);
+                console.log("error occurred");
+       });
 }
 
 export function logoutUserService() {

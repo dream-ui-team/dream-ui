@@ -12,7 +12,7 @@ import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import Icon from "react-native-vector-icons/SimpleLineIcons";
-import { Input, Button } from "../../../components";
+import { Input, Button,Header } from "../../../components";
 import { Alert, AsyncStorage } from "react-native";
 
 
@@ -24,7 +24,7 @@ interface Props {
 class AccountDetails extends Component<Props, {}> {
 
   constructor(props) {
-    // 
+    //
     super(props);
     this.state = {
        values : []
@@ -43,6 +43,11 @@ class AccountDetails extends Component<Props, {}> {
     return (
 
       <View style={styles.container}>
+      <Header
+        title="My account details"
+        leftButtonPress={() => navigation.openDrawer()}
+        rightButtonPress={() => this.handleLogout()}
+      />
         <TouchableOpacity
           style={styles.ProfileButton}
           onPress={ () => this.props.navigation.navigate("MyProfileDetails",{values:this.state.values})}

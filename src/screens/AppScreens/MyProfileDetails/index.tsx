@@ -4,6 +4,7 @@ import { View,
   Platform,
   ScrollView,
   AsyncStorage,
+  Alert,
   TextInput,
   Text  } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
@@ -11,9 +12,11 @@ import { connect } from "react-redux";
 import { Formik } from "formik";
 import { Header } from "../../../components";
 import { AvatarItem,Input, Button } from "../../../components";
-import { logoutUserService } from "../../../redux/services/user";
+import { logoutUserService, updateUserProfile } from "../../../redux/services/user";
 import {NavigationEvents} from 'react-navigation';
 import styles from "./styles";
+
+
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
@@ -23,25 +26,35 @@ interface MyProfileData {
   firstName: string;
   lastName: string;
   mobileNumber: number;
-  email: string
+  emailAddress: string;
+  userId: string;
 }
 
 class MyProfileDetails extends Component<Props, State> {
+
   constructor(props: Props) {
     super(props);
     this.state ={
       values: this.props.navigation.getParam("values","NO-ID")
     }
-    console.log("my profile "+this.state.values)
   }
 
-  componentDidMount() {
- }
 
  handleProfileUpdate = (values: MyProfileData) => {
-   const { navigation } = this.props;
-   console.log("your name is " + values.firstName);
- }
+   console.log("Updating user info"+values.userId);
+   updateUserProfile(values.userId,values.mobileNumber,values.firstName,values.lastName,values.emailAddress)
+     .then( res => {
+       if(res["errorCode"]==undefined || res["errorCode"]==""){
+         //let userToken = `${values.username}${values.password}`;
+         AsyncStorage.setItem("userToken",  JSON.stringify(values));
+         Alert.alert("Successfully updated user information")
+         this.props.navigation.navigate("AppStack");
+       }else{
+         Alert.alert(res["errorMessage"]);
+         //navigation.navigate("RegistrationStack");
+       }
+     });
+  }
 
   handleLogout = () => {
     const { navigation } = this.props;
@@ -54,6 +67,11 @@ class MyProfileDetails extends Component<Props, State> {
 
     return (
       <View style={styles.container}>
+      <Header
+        title="My Profile details"
+        leftButtonPress={() => navigation.openDrawer()}
+        rightButtonPress={() => this.handleLogout()}
+      />
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
@@ -62,8 +80,9 @@ class MyProfileDetails extends Component<Props, State> {
               initialValues={{
                  firstName: `${this.state.values.firstName}`,
                  lastName:`${this.state.values.lastName}`,
-                 email:`${this.state.values.emailAddress}`,
-                 mobileNum:`${this.state.values.mobileNumber}`
+                 emailAddress:`${this.state.values.emailAddress}`,
+                 mobileNumber:`${this.state.values.mobileNumber}`,
+                 userId:`${this.state.values.userId}`,
                  }}
 
               onSubmit={values => this.handleProfileUpdate(values)}
@@ -91,18 +110,18 @@ class MyProfileDetails extends Component<Props, State> {
                       <Text>Email:</Text>
                       <Input
                         placeholder="Email"
-                        value={props.values.email}
+                        value={props.values.emailAddress}
                         onChangeText={props.handleChange("email")}
                         //onBlur={props.handleBlur("email")}
-                        error={props.touched.email && props.errors.email}
+                        error={props.touched.emailAddress && props.errors.emailAddress}
                       />
                       <Text>mobile Number:</Text>
                       <Input
                         placeholder="Mobille number"
-                        value={props.values.mobileNum}
-                        onChangeText={props.handleChange("mobileNum")}
+                        value={props.values.mobileNumber}
+                        onChangeText={props.handleChange("mobileNumber")}
                         //onBlur={props.handleBlur("mobileNum")}
-                        error={props.touched.mobileNum && props.errors.mobileNum}
+                        error={props.touched.mobileNumber && props.errors.mobileNumber}
                       />
 
                       <Button text="Update my profile" onPress={props.handleSubmit} />

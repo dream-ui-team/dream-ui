@@ -54,6 +54,7 @@ class Registration extends Component<Props, {}> {
            //      {cancelable: false},
            //  );
             console.log("Registration successful");
+            Alert.alert("Registration successful. Please relogin")
             navigation.navigate("AuthStack");
 
             }else if(res["errorCode"]==20003 || res["errorCode"]==20004 )

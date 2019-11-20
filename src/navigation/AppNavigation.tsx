@@ -10,6 +10,7 @@ const { width } = Dimensions.get("window");
 import Home from "../screens/AppScreens/Home";
 import Blank from "../screens/AppScreens/Blank";
 import AddressDetails from "../screens/AppScreens/AddressDetails";
+import VehicleDetails from "../screens/AppScreens/VehicleDetails";
 import SideBar from "../screens/AppScreens/SideBar";
 import Login from "../screens/AuthScreens/Login";
 import AuthLoading from "../screens/AuthLoading";
@@ -78,7 +79,8 @@ export default createAppContainer(
       RegistrationStack: RegistrationStack,
       MyProfileDetails: MyProfileDetails,
       AppStack: AppStack,
-      AddressDetails: { screen: AddressDetails }
+      AddressDetails: { screen: AddressDetails },
+      VehicleDetails: { screen: VehicleDetails }
     },
     {
       initialRouteName: "AuthLoading"
