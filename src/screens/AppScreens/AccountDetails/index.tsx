@@ -40,6 +40,7 @@ class AccountDetails extends Component<Props, {}> {
   }
 
   render() {
+    const { navigation } = this.props;
     return (
 
       <View style={styles.container}>
@@ -60,6 +61,12 @@ class AccountDetails extends Component<Props, {}> {
          >
            <Text> My address </Text>
          </TouchableOpacity>
+         <TouchableOpacity
+           style={styles.ProfileButton}
+           onPress={() => navigation.navigate("VehicleDetails")}
+         >
+         <Text> My Vehicles </Text>
+       </TouchableOpacity>
         </View>
 
      )

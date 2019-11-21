@@ -17,6 +17,7 @@ import AuthLoading from "../screens/AuthLoading";
 import Registration from "../screens/AuthScreens/Registration";
 import AccountDetails from "../screens/AppScreens/AccountDetails";
 import MyProfileDetails from "../screens/AppScreens/MyProfileDetails";
+import AddAddress from "../screens/AppScreens/AddressDetails/AddAddress";
 
 const MainStack = createStackNavigator(
   {
@@ -80,7 +81,8 @@ export default createAppContainer(
       MyProfileDetails: MyProfileDetails,
       AppStack: AppStack,
       AddressDetails: { screen: AddressDetails },
-      VehicleDetails: { screen: VehicleDetails }
+      VehicleDetails: { screen: VehicleDetails },
+      AddAddress:{screen:AddAddress}
     },
     {
       initialRouteName: "AuthLoading"

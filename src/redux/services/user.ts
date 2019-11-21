@@ -125,6 +125,60 @@ export function updateUserProfile(userId: string, mobileNumber: string, firstNam
        });
 }
 
+export function userAddAddressService(addressLine1:string,addressLine2:string,country:string,state:string,city:string,pinCode:string,userId:string) {
+  return fetch(`${urls.Base}/users/addresses`,{
+      method:'POST',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+  			addressLine1:addressLine1,
+  			addressLine2:addressLine2,
+  			country:country,
+  			state:state,
+  			city:city,
+  			pinCode:pinCode,
+        userId:userId
+  		  })
+}).then(res => res.json())
+  .then(response => {
+    console.log("reponse occurred");
+    return response
+  }).catch(error => {
+    console.log(res);
+    console.log("error occurred");
+
+  });
+}
+
+export function userUpdateAddressService(userAddressId:string,addressLine1:string,addressLine2:string,country:string,state:string,city:string,pinCode:string,userId:string) {
+  console.log("in update service"+`${userId}`+" "+`${userAddressId}` +" "+pinCode);
+  return fetch(`${urls.Base}/users/${userId}/addresses`,{
+      method:'PUT',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+        userAddressId:userAddressId,
+  			addressLine1:addressLine1,
+  			addressLine2:addressLine2,
+  			country:country,
+  			state:state,
+  			city:city,
+  			pinCode:pinCode
+  		  })
+}).then(res => res.json())
+  .then(response => {
+    console.log("reponse occurred");
+    return response
+  }).catch(error => {
+    console.log(res);
+    console.log("error occurred");
+
+  });
+}
 export function logoutUserService() {
   return new Promise((resolve, reject) => {
     AsyncStorage.removeItem("userToken")
