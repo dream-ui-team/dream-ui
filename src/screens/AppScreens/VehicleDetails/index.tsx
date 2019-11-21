@@ -8,6 +8,7 @@ import { AvatarItem,Input, CommonButton } from "../../../components";
 import { logoutUserService,getUserVehicles } from "../../../redux/services/user";
 import {NavigationEvents} from 'react-navigation';
 import AwesomeButton from "react-native-really-awesome-button";
+import { colors } from "../../../constants";
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
@@ -15,6 +16,13 @@ interface Props {
 
 interface itemProp {
   item: any;
+}
+
+interface State {
+  page: number;
+  limit: number;
+  values: string;
+  vehicles: Array<Object>;
 }
 
 class VehicleDetails extends Component<Props, State> {
@@ -62,13 +70,13 @@ class VehicleDetails extends Component<Props, State> {
     });
   };
 
-  handleUpdate = () => {
+  handleUpdate = (vehicle) => {
     const { navigation } = this.props;
     logoutUserService().then(() => {
       navigation.navigate("AuthStack");
     });
   };
-  handleDelete = () => {
+  handleDelete = (vehicle) => {
     const { navigation } = this.props;
     logoutUserService().then(() => {
       navigation.navigate("AuthStack");
@@ -86,23 +94,51 @@ class VehicleDetails extends Component<Props, State> {
         />
         <FlatList
           data={this.state.vehicles}
-          keyExtractor={(x, i) => i}
+          keyExtractor={(x, i) => i.toString()}
           renderItem={({ item }) =>
-          <View style={styles1.container}>
-		        <View style = { styles1.item_text_style}>
-                
-                <Text>Model: {item.model}</Text>
-                <Text>Registration Nr: {item.registrationNumber}</Text>
-                <Text>Manufacturer: {item.manufacturerName}</Text>
-                <Text>Type: {item.vehicleTypeCode}</Text>
-		        </View>
-            <View style={styles1.buttonContainer}>
-              <View style={{width: 50, height: 50}} ><CommonButton text="Update" onPress={() => this.handleUpdate()}/></View>
-              <View style={{width: 50, height: 50}}><CommonButton text="Delete" onPress={() => this.handleDelete()}/></View>
+          <View style={styles.vehicleContainer}>
+            <View style={styles.vehicleContainerRow}>
+              <View style={styles.label}>
+                <Text style={styles.text}>Model</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.text}>{item.model}</Text>
+              </View>
+            </View>
+            <View style={styles.vehicleContainerRow}>
+              <View style={styles.label}>
+                <Text style={styles.text}>Registration Nr</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.text}>{item.registrationNumber}</Text>
+              </View>
+            </View>
+            <View style={styles.vehicleContainerRow}>
+              <View style={styles.label}>
+                <Text style={styles.text}>Manufacturer</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.text}>{item.manufacturerName}</Text>
+              </View>
+            </View>
+            <View style={styles.vehicleContainerRow}>
+              <View style={styles.label}>
+                <Text style={styles.text}>Type</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.text}>{item.vehicleTypeCode}</Text>
+              </View>
+            </View>
+            <View style={styles.vehicleContainerRow}>
+              <View style={styles.updateButton}>
+                <CommonButton text="Update" onPress={()=>this.handleUpdate(item)}/>
+              </View>
+              <View style={styles.updateButton}>
+                <CommonButton text="Delete" onPress={()=>this.handleDelete(item)}/>
+              </View>
             </View>
           </View>
-              }
-        />
+        }/>
         
       </View>
     );
@@ -110,48 +146,7 @@ class VehicleDetails extends Component<Props, State> {
 }
 
 const styles1 = StyleSheet.create({
-  container:{
-    margin: 4,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#68a0cf',
-    backgroundColor:'white'
-  },
 
-  AwesomeButton:{
-    width:10,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#68a0cf'
-  },
-  buttonContainer:{
-    margin: 4,
-    borderRadius: 5
-  },
-  updatebutton:{
-    flexDirection: 'row'
-  },
-  deletebutton:{
-    marginLeft:20
-  },
-item_text_style:
-{
-  fontSize: 20,
-  color: '#000',
-  padding: 5,
-  marginLeft:10
-},
-
-item_separator:
-{
-  height: 1,
-  width: '100%',
-  backgroundColor: '#263238',
-},
-ButtonContainer:
-{
-  flex: 1
-}
 
 });
 export default VehicleDetails;

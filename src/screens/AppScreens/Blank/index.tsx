@@ -8,7 +8,21 @@ interface Props {
   navigation: NavigationScreenProp<NavigationState>;
 }
 
-class Blank extends Component<Props, {}> {
+interface State {
+  page: number;
+  limit: number;
+}
+
+
+class Blank extends Component<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      page: 1,
+      limit: 20
+    };
+  }
   render() {
     const { navigation } = this.props;
     return (
