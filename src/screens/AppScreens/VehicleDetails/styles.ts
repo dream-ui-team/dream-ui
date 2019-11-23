@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 import { colors } from "../../../constants";
 const styles = StyleSheet.create({
   text:{
-    color: "#00000",
+    color: '#000000',
     fontWeight: "600"
   },
   container: {

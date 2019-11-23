@@ -4,16 +4,18 @@ import {
   Text,
   KeyboardAvoidingView,
   ScrollView,
-  Platform,StyleSheet
+  Platform,StyleSheet,
+  TouchableOpacity,Button
 } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import Icon from "react-native-vector-icons/SimpleLineIcons";
 import { userAddAddressService,userUpdateAddressService } from "../../../redux/services/user";
-import { Input, Button } from "../../../components";
+import { Input} from "../../../components";
 import styles from "./styles";
 import { Alert, AsyncStorage } from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { colors } from "../../../constants";
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
@@ -39,6 +41,7 @@ class AddAddress extends Component<Props, State> {
       buttonText:"",
 
     };
+	this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     this.state.addresses=this.props.navigation.getParam('details',  this.state.addresses);
     console.log(this.state.addresses.city);
   }
@@ -58,7 +61,7 @@ class AddAddress extends Component<Props, State> {
       }
       else
       {
-          this.setState({buttonText:"ADD"})
+          this.setState({buttonText:"Add Address"})
           // this.state.addresses.addressLine1='';
           // this.state.addresses.addressLine2='';
           //  this.state.addresses.country='';
@@ -70,7 +73,7 @@ class AddAddress extends Component<Props, State> {
 
   handleAddressChange = (values: addressData) => {
     const { navigation } = this.props;
-    if(this.state.buttonText == "ADD")
+    if(this.state.buttonText == "Add Address")
     {
     console.log("in add address");
      userAddAddressService(values.addressLine1, values.addressLine2,values.country,values.state,values.city,values.pinCode,this.state.loggedInUser.userId).then(res => {
@@ -98,12 +101,16 @@ class AddAddress extends Component<Props, State> {
       navigation.navigate("AuthStack");
     });
   };
-
+handleBackButtonClick() {
+	const { navigation } = this.props;
+      navigation.navigate("AddressDetails");
+      return true;
+  }
   render() {
     const { navigation } = this.props;
-
     return (
       <View style={styles.container}>
+	  
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
@@ -118,13 +125,18 @@ class AddAddress extends Component<Props, State> {
 
               return (
                 <View>
-                  <View style={styles.headStyle}>
-                    <Icon name="emotsmile" size={100} />
-                    <Text style={styles.headText}>
-                      Let's sign up ..!!
-                    </Text>
-                  </View>
+                  <View style={styles1.profileContainer}>
+					<View style={styles1.leftContainer}>
+					  <TouchableOpacity style={styles1.iconButton} onPress={this.handleBackButtonClick}>
+						<Icon name="arrow-back" size={24}  />
+					  </TouchableOpacity>
+					</View>
+					<View style={styles1.midContainer}>
+					  <Text style={styles1.headerTitle}>{`ProfileDetails`}</Text>
+					</View>
+				  </View>
                   <View style={styles.inputContainer}>
+				  <Text>Address Line1:</Text>
                     <Input
                       placeholder="AddressLine1"
                       value={props.values.addressLine1}
@@ -132,6 +144,7 @@ class AddAddress extends Component<Props, State> {
                       //onBlur={props.handleBlur("firstName")}
                       error={props.touched.addressLine1 && props.errors.addressLine1}
                     />
+					<Text>Address Line2:</Text>
                     <Input
                       placeholder="AddressLine2"
                       value={props.values.addressLine2}
@@ -139,6 +152,7 @@ class AddAddress extends Component<Props, State> {
                      //onBlur={props.handleBlur("lastName")}
                       error={props.touched.addressLine2 && props.errors.addressLine2}
                     />
+					<Text>Country:</Text>
                     <Input
                       placeholder="Country"
                       value={props.values.country}
@@ -146,6 +160,7 @@ class AddAddress extends Component<Props, State> {
                       //onBlur={props.handleBlur("email")}
                       error={props.touched.country && props.errors.country}
                     />
+					<Text>State:</Text>
                     <Input
                       placeholder="State"
                       value={props.values.state}
@@ -153,6 +168,7 @@ class AddAddress extends Component<Props, State> {
                       //onBlur={props.handleBlur("mobileNum")}
                       error={props.touched.state && props.errors.state}
                     />
+					<Text>City:</Text>
                     <Input
                       placeholder="City"
                       value={props.values.city}
@@ -161,6 +177,7 @@ class AddAddress extends Component<Props, State> {
 
                       error={props.touched.city && props.errors.city}
                     />
+					<Text>Pincode:</Text>
                     <Input
                       placeholder="Pincode"
                       value={props.values.pinCode}
@@ -169,7 +186,9 @@ class AddAddress extends Component<Props, State> {
 
                       error={props.touched.pinCode && props.errors.pinCode}
                     />
-                    <Button text={this.state.buttonText} onPress={props.handleSubmit} />
+					<View style={styles1.ButtonContainer}>
+                    <Button title={this.state.buttonText} color = "#3F51B5" onPress={props.handleSubmit} />
+					</View>
                   </View>
                 </View>
               );
@@ -208,10 +227,41 @@ ButtonContainer:
 {
   flex: 1,
   flexDirection: 'row',
-  width: '30%',
+  width: '50%',
   height: 40,
   justifyContent: 'space-between',
-}
+  marginLeft:10,
+  marginTop:10
+  //backgroundColor:'#3F51B5'
+},
+profileContainer: {
+  height: 56,
+  flexDirection: "row",
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: colors.containerBg,
+  borderBottomWidth: 1,
+  borderBottomColor: colors.borderColor
+},
+leftContainer: {
+    flex: 1,
+    alignItems: "flex-start"
+  },
+  midContainer: {
+    flex:2 ,
+	marginLeft:20
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "700"
+  },
+  rightContainer: {
+    flex: 1,
+    alignItems: "flex-end"
+  },
+  iconButton: {
+    paddingHorizontal: 16
+  }
 
 });
 export default AddAddress;

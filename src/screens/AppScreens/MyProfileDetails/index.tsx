@@ -111,7 +111,7 @@ class MyProfileDetails extends Component<Props, State> {
                       <Input
                         placeholder="Email"
                         value={props.values.emailAddress}
-                        onChangeText={props.handleChange("email")}
+                        onChangeText={props.handleChange("emailAddress")}
                         //onBlur={props.handleBlur("email")}
                         error={props.touched.emailAddress && props.errors.emailAddress}
                       />

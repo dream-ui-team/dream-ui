@@ -1,14 +1,14 @@
 import React, { Component } from "react";
-import { View, FlatList, ActivityIndicator,AsyncStorage,Text,StyleSheet ,TouchableOpacity } from "react-native";
+import { View, FlatList, ActivityIndicator,AsyncStorage,Text,StyleSheet ,TouchableOpacity,Button} from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { connect } from "react-redux";
 import { Header } from "../../../components";
 import styles from "./styles";
 import { AvatarItem,Input, CommonButton } from "../../../components";
-import { logoutUserService,getUserAddressService } from "../../../redux/services/user";
+import { logoutUserService,getUserAddressService,userDeleteAddressService } from "../../../redux/services/user";
 import {NavigationEvents} from 'react-navigation';
 import { colors } from "../../../constants";
-import Icons from 'react-native-vector-icons/MaterialIcons';
+import Icon from "react-native-vector-icons/MaterialIcons";
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
 }
@@ -22,7 +22,7 @@ class AddressDetails extends Component<Props, State> {
     super(props);
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     this.deleteAddress = this.deleteAddress.bind(this);
-    this.updateAddress = this.updateAddress.bind(this);
+    //this.updateAddress = this.updateAddress.bind(this);
     this.state = {
       page: 1,
       limit: 20,
@@ -31,23 +31,13 @@ class AddressDetails extends Component<Props, State> {
     };
   }
   deleteAddress = (item) =>{
-  	  fetch(`http://192.168.42.86:8090/users/${this.state.values.userId}/addresses/${item.userAddressId}`,{
-          method:'DELETE',
-          headers: {
-              Accept: 'application/plain',
-              //'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin':'*',
-              'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
-              'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
-              'Sec-Fetch-Mode': 'no-cors'
-            },
-          }).then(res => {
-                //this.setState({ contacts: data });
-                console.log('Address deleted successfully');
-                this.componentDidMount();
-              })
-              .catch(console.log)
-
+	  
+	   userDeleteAddressService(this.state.values.userId,item.userAddressId).then(res =>{
+                    //this.setState({ addresses: res });
+                    console.log('Address Deleted successfully');
+					this.componentDidMount();
+                  })
+                  .catch(console.log)
     }
   componentDidMount() {
     console.log("mounted");
@@ -62,14 +52,6 @@ class AddressDetails extends Component<Props, State> {
                   .catch(console.log)
         });
   }
-updateAddress = (item) =>{
-  console.log(item);
-  this.props.navigation.navigate('AddAddress',{
-                    details:item
-                    });
-
-}
-
   handleLogout = () => {
     const { navigation } = this.props;
     logoutUserService().then(() => {
@@ -86,42 +68,92 @@ updateAddress = (item) =>{
     return (
       <View style={styles.container}>
       <View style={styles1.profileContainer}>
-      <View style={styles1.leftContainer}>
-        <TouchableOpacity onPress={this.handleBackButtonClick}>
-            <Icons name={'arrow-back'} style={styles1.iconButton}/>
-        </TouchableOpacity>
+        <View style={styles1.leftContainer}>
+          <TouchableOpacity style={styles1.iconButton} onPress={this.handleBackButtonClick}>
+            <Icon name="arrow-back" size={24}  />
+          </TouchableOpacity>
         </View>
-      <View style={styles1.midContainer}>
-        <Text style={styles1.headerTitle}>{`Profile Details`}</Text>
-      </View>
+        <View style={styles1.midContainer}>
+          <Text style={styles1.headerTitle}>{`Profile Details`}</Text>
+        </View>
       </View>
       <View style={styles1.container}>
-        <View style={{marginTop:8,marginLeft:10,flexDirection: 'row'}}>
-          <CommonButton text="Add New Address" onPress={()=>navigation.navigate("AddAddress")}/>
-        </View>
+          <Button title="Add New Address"  color = "#3F51B5" onPress={()=>navigation.navigate("AddAddress")}/>
         </View>
         <View style = { styles1.item_separator }/>
         <FlatList
           data={this.state.addresses}
-          keyExtractor={(x, i) => i}
+          keyExtractor={(x, i) => i.toString()}
           renderItem={({ item }) =>
-          <View style={styles1.container}>
-		        <View style = { styles1.item_text_style}>
-                <Text style = {{fontWeight:"700"}}>{`${this.state.values.firstName} ${this.state.values.lastName}`}</Text>
-                <Text>{item.addressLine1}</Text>
-                <Text>{item.addressLine2}</Text>
-                <Text>{item.state}</Text>
-                <Text>{item.city}</Text>
-                <Text>{`${item.country}-${item.pinCode}`}</Text>
-                <Text>{`Mobile Number: ${this.state.values.mobileNumber}`}</Text>
-               <View style={{flexDirection: 'row',marginTop:10}}>
-                   <View style={{width: 50, height: 50}} ><CommonButton text="UPDATE" onPress={()=>this.updateAddress(item)}/></View>
-                 <View style={{marginLeft:20}}>
-                   <View style={{marginLeft:20,width: 50, height: 50}}><CommonButton text="DELETE" onPress={()=>this.deleteAddress(item)}/></View>
-                   </View>
-                   </View>
-		            </View>
-                </View>
+           <View style={styles.addressContainer}>
+            <View style={styles.addressContainerRow}>
+              <View style={styles.label}>
+                <Text style={styles.text}>Name:</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.text}>{`${this.state.values.firstName} ${this.state.values.lastName}`}</Text>
+              </View>
+            </View>
+			<View style={styles.addressContainerRow}>
+              <View style={styles.label}>
+                <Text style={styles.text}>Address Line1:</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.text}>{item.addressLine1}</Text>
+              </View>
+            </View>
+			<View style={styles.addressContainerRow}>
+              <View style={styles.label}>
+                <Text style={styles.text}>Address Line2:</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.text}>{item.addressLine2}</Text>
+              </View>
+            </View>
+			<View style={styles.addressContainerRow}>
+              <View style={styles.label}>
+                <Text style={styles.text}>State:</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.text}>{item.state}</Text>
+              </View>
+            </View>
+			<View style={styles.addressContainerRow}>
+              <View style={styles.label}>
+                <Text style={styles.text}>City:</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.text}>{item.city}</Text>
+              </View>
+            </View>
+			<View style={styles.addressContainerRow}>
+              <View style={styles.label}>
+                <Text style={styles.text}>Country:</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.text}>{`${item.country}-${item.pinCode}`}</Text>
+              </View>
+            </View>
+			<View style={styles.addressContainerRow}>
+              <View style={styles.label}>
+                <Text style={styles.text}>Mobile No:</Text>
+              </View>
+              <View style={styles.data}>
+                <Text style={styles.text}>{this.state.values.mobileNumber}</Text>
+              </View>
+            </View>
+		  <View style={{marginTop:10}}></View>
+			<View style={styles.addressContainerRow}>
+              <View style={styles.updateButton}>
+                <CommonButton text="Update" onPress={ ()=>this.props.navigation.navigate('AddAddress',{
+                    details:item
+                    })}/>
+              </View>
+              <View style={styles.updateButton}>
+                <CommonButton text="Delete" onPress={()=>this.deleteAddress(item)}/>
+              </View>
+            </View>
+          </View>
               }
         />
       </View>
@@ -131,8 +163,8 @@ updateAddress = (item) =>{
 
 const styles1 = StyleSheet.create({
   container:{
-    margin: 4,
-    borderRadius: 5,
+    margin: 8,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#68a0cf',
     backgroundColor:'white'
@@ -161,33 +193,24 @@ profileContainer: {
   borderBottomColor: colors.borderColor
 },
 leftContainer: {
-  flex: 1,
-  alignItems: "flex-start"
-},
-midContainer: {
-  flex: 10,
-  alignItems: "center"
-},
-headerTitle: {
-  fontSize: 16,
-  fontWeight: "700"
-},
-rightContainer: {
-  flex: 1,
-  alignItems: "flex-end"
-},
-iconButton: {
-  paddingHorizontal: 16
-},
-buttonContainer:{
-  margin: 4,
-  borderRadius: 5
-},
-updatebutton:{
-  flexDirection: 'row'
-},
-deletebutton:{
-  marginLeft:20
-},
+    flex: 1,
+    alignItems: "flex-start"
+  },
+  midContainer: {
+    flex:2 ,
+	marginLeft:20
+    //alignItems: "center"
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "700"
+  },
+  rightContainer: {
+    flex: 1
+    //alignItems: "flex-end"
+  },
+  iconButton: {
+    paddingHorizontal: 16
+  }
 });
 export default AddressDetails;

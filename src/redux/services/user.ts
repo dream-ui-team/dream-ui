@@ -179,6 +179,48 @@ export function userUpdateAddressService(userAddressId:string,addressLine1:strin
 
   });
 }
+export function userDeleteAddressService(userId:string,userAddressId:string) {
+  return fetch(`http://192.168.42.86:8090/users/${userId}/addresses/${userAddressId}`,{
+      method:'DELETE',
+      headers: {
+          Accept: 'application/plain',
+              //'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin':'*',
+              'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
+              'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
+              'Sec-Fetch-Mode': 'no-cors'
+        }
+}).then(res => {
+    console.log("reponse occurred");
+    return res
+  }).catch(error => {
+    console.log(res);
+    console.log("error occurred");
+
+  });
+}
+
+export function getAllLocationsService() {
+  return fetch(`${urls.Base}/locations`,{
+      method:'GET',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+		  'Access-Control-Allow-Origin':'*',
+            'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
+            'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
+            'Sec-Fetch-Mode': 'no-cors'
+        }
+}).then(res => res.json())
+  .then(response => {
+    console.log("reponse occurred");
+    return response
+  }).catch(error => {
+    console.log(res);
+    console.log("error occurred");
+
+  });
+}
 export function logoutUserService() {
   return new Promise((resolve, reject) => {
     AsyncStorage.removeItem("userToken")

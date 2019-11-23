@@ -65,7 +65,7 @@ const AppStack = createDrawerNavigator(
     AccountDetails: { screen: AccountDetails},
     VehicleDetails: { screen: VehicleDetails },
     AddressDetails: { screen: AddressDetails },
-    AddAddress:{screen:AddAddress},
+    
     Blank: { screen: Blank }
   },
   {
@@ -83,6 +83,7 @@ export default createAppContainer(
       RegistrationStack: RegistrationStack,
       MyProfileDetails: MyProfileDetails,
       AppStack: AppStack,
+	  AddAddress:{screen:AddAddress},
       
     },
     {
