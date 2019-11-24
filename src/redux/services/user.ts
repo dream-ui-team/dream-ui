@@ -221,6 +221,29 @@ export function getAllLocationsService() {
 
   });
 }
+
+export function getServiceCentresByLocationId(locationId:string) {
+  return fetch(`${urls.Base}partners/locations/${locationId}`,{
+      method:'GET',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+		  'Access-Control-Allow-Origin':'*',
+            'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
+            'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
+            'Sec-Fetch-Mode': 'no-cors'
+        }
+}).then(res => res.json())
+  .then(response => {
+    console.log("reponse occurred");
+    return response
+  }).catch(error => {
+    console.log(res);
+    console.log("error occurred");
+
+  });
+}
+
 export function logoutUserService() {
   return new Promise((resolve, reject) => {
     AsyncStorage.removeItem("userToken")
