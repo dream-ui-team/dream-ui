@@ -1,6 +1,12 @@
 import { AsyncStorage } from "react-native";
 import { colors,urls } from "../../constants";
 import { Alert} from 'react-native';
+import base64 from 'react-native-base64';
+
+const accessToken='';
+const expiryTime='';
+const lastUpdatedTime='';
+
 
 export function fetchImageService(page?: number, limit?: number) {
   return new Promise((resolve, reject) => {
@@ -17,30 +23,34 @@ export function fetchImageService(page?: number, limit?: number) {
   });
 }
 
-export function loginUserService(username: string, password: string) {
-    return fetch(`${urls.Base}users/login?mobileNum=${encodeURIComponent(`${username}`)}&password=${encodeURIComponent(`${password}`)}`,{
+// Token validate{
+//  return fetch()
+//
+
+export function loginUserService(username: string, password: string, accessToken: string) {
+
+    console.log("Retrieve token from AsyncStorage:" + accessToken);
+    // token
+    // validate true / false
+    // false => {}
+
+    return fetch(`${urls.Base}/users/login?mobileNum=${encodeURIComponent(`${username}`)}&password=${encodeURIComponent(`${password}`)}`,{
         method:'GET',
         headers: {
             Accept: 'application/json',
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin':'*',
-            'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
-            'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
-            'Sec-Fetch-Mode': 'no-cors'
-          },
+            Authorization: `Bearer ${accessToken}`
+          }
         }).then(res => res.json())
           .then(response => {
             return response
           })
           .catch(error => {
             Alert.alert(error);
-
           });
 }
 
 export function userRegistrationService(mobileNum: string, password: string,firstName:string,lastName:string,email:string) {
 
-  console.log(`${firstName}`);
   return fetch(`${urls.Base}/users`,{
         method:'POST',
         headers: {
@@ -101,7 +111,6 @@ export function getUserVehicles(userId:String) {
 }
 
 export function updateUserProfile(userId: string, mobileNumber: string, firstName:string, lastName:string, emailAddress:string) {
-  console.log(`${firstName}`);
   return fetch(`${urls.Base}/users`,{
         method:'PUT',
         headers: {
@@ -153,7 +162,6 @@ export function userAddAddressService(addressLine1:string,addressLine2:string,co
 }
 
 export function userUpdateAddressService(userAddressId:string,addressLine1:string,addressLine2:string,country:string,state:string,city:string,pinCode:string,userId:string) {
-  console.log("in update service"+`${userId}`+" "+`${userAddressId}` +" "+pinCode);
   return fetch(`${urls.Base}/users/${userId}/addresses`,{
       method:'PUT',
       headers: {
@@ -179,12 +187,12 @@ export function userUpdateAddressService(userAddressId:string,addressLine1:strin
 
   });
 }
+
 export function userDeleteAddressService(userId:string,userAddressId:string) {
-  return fetch(`http://192.168.42.86:8090/users/${userId}/addresses/${userAddressId}`,{
+  return fetch(`${urls.Base}/users/${userId}/addresses/${userAddressId}`,{
       method:'DELETE',
       headers: {
           Accept: 'application/plain',
-              //'Content-Type': 'application/json',
               'Access-Control-Allow-Origin':'*',
               'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
               'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
@@ -206,10 +214,10 @@ export function getAllLocationsService() {
       headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
-		  'Access-Control-Allow-Origin':'*',
-            'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
-            'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
-            'Sec-Fetch-Mode': 'no-cors'
+		      'Access-Control-Allow-Origin':'*',
+          'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
+          'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
+          'Sec-Fetch-Mode': 'no-cors'
         }
 }).then(res => res.json())
   .then(response => {
@@ -243,6 +251,43 @@ export function getServiceCentresByLocationId(locationId:string) {
 
   });
 }
+
+export function getAccessToken(){
+
+     // check if current token is expired
+    // if not expired, return the existing token
+
+    // if expired, get a new one and set it into above constants
+
+    var headers = new Headers();
+    headers.append("Authorization", "Basic " + base64.encode(`${urls.clientId}:${urls.clientSecret}`));
+     //headers.append("Accept", "application/json");
+    //headers.append("Content-Type", "application/json");
+    headers.append("Access-Control-Allow-Origin", "*");
+    headers.append("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,PUT,OPTIONS");
+    headers.append("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token, content-type, Authorization");
+    headers.append("Access-Control-Max-Age", "3600");
+  //  headers.append("Sec-Fetch-Mode", "no-cors");
+
+    let formdata = new FormData();
+    formdata.append("username", 'tester');
+    formdata.append("password", 'tester');
+    formdata.append("grant_type", 'password');
+
+
+    return fetch(`${urls.Base}/oauth/token`,{
+                           method:'POST',
+                           headers: headers,
+                           body: formdata
+              }).then(res => res.json())
+    .then(response => {
+      console.log("Successfully retrieved oauth token:"+response["access_token"]);
+      return response
+    }).catch(error => {
+      console.log("error occurred whiling getting oauth token:" +error);
+    });
+}
+
 
 export function logoutUserService() {
   return new Promise((resolve, reject) => {
