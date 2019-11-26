@@ -18,6 +18,8 @@ import Registration from "../screens/AuthScreens/Registration";
 import AccountDetails from "../screens/AppScreens/AccountDetails";
 import MyProfileDetails from "../screens/AppScreens/MyProfileDetails";
 import AddAddress from "../screens/AppScreens/AddressDetails/AddAddress";
+import ServiceCenterDetails from "../screens/AppScreens/Home/ServiceCenterDetails";
+import OrderRequest from "../screens/AppScreens/Home/OrderRequest";
 
 const MainStack = createStackNavigator(
   {
@@ -65,7 +67,6 @@ const AppStack = createDrawerNavigator(
     AccountDetails: { screen: AccountDetails},
     VehicleDetails: { screen: VehicleDetails },
     AddressDetails: { screen: AddressDetails },
-    
     Blank: { screen: Blank }
   },
   {
@@ -84,6 +85,8 @@ export default createAppContainer(
       MyProfileDetails: MyProfileDetails,
       AppStack: AppStack,
 	  AddAddress:{screen:AddAddress},
+	  ServiceCenterDetails:{screen:ServiceCenterDetails},
+	  OrderRequest:{screen:OrderRequest}
       
     },
     {

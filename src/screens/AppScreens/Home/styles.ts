@@ -105,6 +105,21 @@ const styles = StyleSheet.create({
     backgroundColor:'#F4F4F4',
 	alignItems:'center'
   },
+  serviceDetailsText:{
+	 color: '#000000',
+	fontSize:22,
+	paddingLeft:5,
+	paddingBottom:3
+  },
+  serviceCenterLabel:{
+    paddingLeft: 5,
+    paddingBottom: 3,
+  },
+   serviceCenterText:{
+    color: '#000000',
+    fontWeight: "600",
+	fontSize:22
+  },
 });
 
 export default styles;

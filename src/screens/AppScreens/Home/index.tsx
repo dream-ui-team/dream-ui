@@ -158,12 +158,12 @@ class Home extends Component {
 		  <View style={{marginTop:10}}></View>
 			<View style={styles.homeContainerRow}>
               <View style={styles.updateButton}>
-                <TouchableOpacity  style={styles.buttonStyle}>
+                <TouchableOpacity  style={styles.buttonStyle} onPress={()=>navigation.navigate('ServiceCenterDetails',{details:item})}>
 					<Text style={styles.buttonTextStyle}>{'Show Details'}</Text>
 					</TouchableOpacity>
               </View>
               <View style={styles.deleteButton}>
-               <TouchableOpacity  style={styles.buttonStyle}>
+               <TouchableOpacity  style={styles.buttonStyle} onPress={()=>navigation.navigate('OrderRequest',{details:item})}>
 					<Text style={styles.buttonTextStyle}>{'Place Request'}</Text>
 				</TouchableOpacity>
               </View>
