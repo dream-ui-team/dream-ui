@@ -67,11 +67,11 @@ export function userRegistrationService(mobileNum: string, password: string,firs
 		  })
 }).then(res => res.json())
   .then(response => {
-    console.log("reponse occurred");
+    console.log("Registration success");
     return response
   }).catch(error => {
     console.log(res);
-    console.log("error occurred");
+    console.log("failed to register");
   });
 }
 
@@ -84,11 +84,11 @@ export function getUserAddressService(userId:String) {
         }
 }).then(res => res.json())
   .then(response => {
-    console.log("reponse occurred");
+    console.log("fetched all addresses");
     return response
   }).catch(error => {
     console.log(res);
-    console.log("error occurred");
+    console.log("failed to get user addresses");
 
   });
 }
@@ -103,7 +103,7 @@ export function getUserVehicles(userId:String) {
           }
         }).then(res => res.json())
           .then(response => {
-            console.log("reponse occurred");
+            console.log("fetched user vehicles");
             return response
           }).catch(error => {
             console.log("error occurred");
@@ -126,7 +126,7 @@ export function updateUserProfile(userId: string, mobileNumber: string, firstNam
       })
     }).then(res => res.json())
         .then(response => {
-             console.log("reponse occurred");
+             console.log("updated user profile");
              return response
         }).catch(error => {
                 console.log(error);
@@ -152,7 +152,7 @@ export function userAddAddressService(addressLine1:string,addressLine2:string,co
   		  })
 }).then(res => res.json())
   .then(response => {
-    console.log("reponse occurred");
+    console.log("added user address");
     return response
   }).catch(error => {
     console.log(res);
@@ -179,7 +179,7 @@ export function userUpdateAddressService(userAddressId:string,addressLine1:strin
   		  })
 }).then(res => res.json())
   .then(response => {
-    console.log("reponse occurred");
+    console.log("updated user address ");
     return response
   }).catch(error => {
     console.log(res);
@@ -199,7 +199,7 @@ export function userDeleteAddressService(userId:string,userAddressId:string) {
               'Sec-Fetch-Mode': 'no-cors'
         }
 }).then(res => {
-    console.log("reponse occurred");
+    console.log("deleted user address ");
     return res
   }).catch(error => {
     console.log(res);
@@ -208,7 +208,15 @@ export function userDeleteAddressService(userId:string,userAddressId:string) {
   });
 }
 
-export function getAllLocationsService() {
+export function getAllLocationsService(accessToken: string) {
+
+  console.log("accessToken is expired"+ accessToken);
+
+  const tokenJson = getAccessToken();
+
+  console.log("this is the response"+tokenJson);
+  console.log("new oauth token is "+  tokenJson[0].access_token);
+
   return fetch(`${urls.Base}/locations`,{
       method:'GET',
       headers: {
@@ -221,7 +229,7 @@ export function getAllLocationsService() {
         }
 }).then(res => res.json())
   .then(response => {
-    console.log("reponse occurred");
+    console.log("received all the location details");
     return response
   }).catch(error => {
     console.log(res);
@@ -243,7 +251,7 @@ export function getServiceCentresByLocationId(locationId:string) {
         }
 }).then(res => res.json())
   .then(response => {
-    console.log("reponse occurred");
+    console.log("fetched all services center based on location");
     return response
   }).catch(error => {
     console.log(res);
@@ -252,7 +260,7 @@ export function getServiceCentresByLocationId(locationId:string) {
   });
 }
 
-export function getAccessToken(){
+export async function getAccessToken(){
 
      // check if current token is expired
     // if not expired, return the existing token
@@ -275,20 +283,39 @@ export function getAccessToken(){
     formdata.append("grant_type", 'password');
 
 
-    return fetch(`${urls.Base}/oauth/token`,{
+      const tokenResponse = await fetch(`${urls.Base}/oauth/token`,{
                            method:'POST',
                            headers: headers,
                            body: formdata
-              }).then(res => res.json())
-    .then(response => {
-      console.log("Successfully retrieved oauth token:"+response["access_token"]);
-      return response
-    }).catch(error => {
-      console.log("error occurred whiling getting oauth token:" +error);
-    });
+                          });
+  const responseJson = await tokenResponse.json();
+  return responseJson;
 }
 
 
+export function getCostSheet(partnerId:string)
+{
+	return fetch(`${urls.Base}partners/${partnerId}/services/1/costsheets`,{
+      method:'GET',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+		  'Access-Control-Allow-Origin':'*',
+            'Access-Control-Allow-Methods':  'GET,POST,PATCH,DELETE,PUT,OPTIONS',
+            'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token, content-type, Authorization',
+            'Sec-Fetch-Mode': 'no-cors'
+        }
+}).then(res => res.json())
+  .then(response => {
+    console.log("reponse occurred");
+    return response
+  }).catch(error => {
+    console.log(error);
+    console.log("error occurred");
+
+  });
+
+}
 export function logoutUserService() {
   return new Promise((resolve, reject) => {
     AsyncStorage.removeItem("userToken")

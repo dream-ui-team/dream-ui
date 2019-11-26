@@ -40,6 +40,13 @@ const loginSchema = Yup.object().shape({
 
 class Login extends Component<Props, {}> {
 
+  constructor(props){
+    super(props);
+    this.state = {
+      accessToken: ""
+    }
+  }
+
   isValidCredentials= function(){
     let isValid = AsyncStorage.getItem("userToken");
     console.log("****"+isValid);
@@ -57,12 +64,14 @@ class Login extends Component<Props, {}> {
       // now login .. actually this api should be not be protected by oauth
       console.log("oauth token is "+  response["access_token"]);
       AsyncStorage.setItem("accessToken", response["access_token"]);
+      this.state.accessToken= response["access_token"];
 
       loginUserService(values.username, values.password,response["access_token"]).then(res => {
 
             if(res["errorCode"]==undefined || res["errorCode"]=="") {
                 AsyncStorage.setItem("userToken",  JSON.stringify(res));
-                navigation.navigate("AppStack");
+                console.log("accessToken before getting to home "+this.state.accessToken);
+                navigation.navigate("AppStack", { accessToken1: this.state.accessToken });
             } else {
                Alert.alert(res["errorMessage"]);
             }
