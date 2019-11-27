@@ -68,7 +68,10 @@ class Home extends Component<Props, HomeState> {
     if (itemValue != "NULL") {
       this.state.locationId = itemValue;
       this.setState({ isNotNull: false });
-      getServiceCentresByLocationId(this.state.locationId)
+      getServiceCentresByLocationId(
+        this.state.locationId,
+        this.state.accessToken
+      )
         .then(res => {
           this.setState({ serviceCentres: res });
           this.state.serviceCentresBackup = [];

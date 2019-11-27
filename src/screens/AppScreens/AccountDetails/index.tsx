@@ -12,83 +12,84 @@ import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import Icon from "react-native-vector-icons/SimpleLineIcons";
-import { Input, Button,Header } from "../../../components";
+import { Input, Button, Header } from "../../../components";
 import { Alert, AsyncStorage } from "react-native";
-
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
 }
 
-
 class AccountDetails extends Component<Props, {}> {
-
   constructor(props) {
     //
     super(props);
     this.state = {
-       values : []
-     }
+      values: []
+    };
   }
 
   componentDidMount() {
-    AsyncStorage.getItem('userToken').then((value) =>{
-      this.setState({values:JSON.parse(value)});
-      }).then(res => {
-        console.log("values are:"+this.state.values.firstName)
+    AsyncStorage.getItem("userToken")
+      .then(value => {
+        this.setState({ values: JSON.parse(value) });
+      })
+      .then(res => {
+        console.log("values are:" + this.state.values.firstName);
       });
   }
 
   render() {
     const { navigation } = this.props;
     return (
-
       <View style={styles.container}>
-      <Header
-        title="My account details"
-        leftButtonPress={() => navigation.openDrawer()}
-        rightButtonPress={() => this.handleLogout()}
-      />
+        <Header
+          title="My account details"
+          leftButtonPress={() => navigation.openDrawer()}
+          rightButtonPress={() => this.handleLogout()}
+        />
         <TouchableOpacity
           style={styles.ProfileButton}
-          onPress={ () => this.props.navigation.navigate("MyProfileDetails",{values:this.state.values})}
+          onPress={() =>
+            this.props.navigation.navigate("MyProfileDetails", {
+              values: this.state.values
+            })
+          }
         >
           <Text> My profile </Text>
         </TouchableOpacity>
-         <TouchableOpacity
-           style={styles.AddressButton}
-           onPress={ () => this.props.navigation.navigate("AddressDetails")}
-         >
-           <Text> My address </Text>
-         </TouchableOpacity>
-         <TouchableOpacity
-           style={styles.ProfileButton}
-           onPress={() => navigation.navigate("VehicleDetails")}
-         >
-         <Text> My Vehicles </Text>
-       </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.AddressButton}
+          onPress={() => this.props.navigation.navigate("AddressDetails")}
+        >
+          <Text> My address </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.ProfileButton}
+          onPress={() => navigation.navigate("VehicleDetails")}
+        >
+          <Text> My Vehicles </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+}
 
-     )
-   }
- }
-
- const styles = StyleSheet.create({
-   container: {
-     flex: 1,
-     justifyContent: 'flex-start',
-     paddingHorizontal: 10
-   },
-   AddressButton: {
-     alignItems: 'center',
-     backgroundColor: 'skyblue',
-     padding: 10
-   },
-   ProfileButton: {
-     alignItems: 'center',
-     backgroundColor: 'powderblue',
-     padding: 10
-   }
- })
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "flex-start",
+    paddingHorizontal: 10
+  },
+  AddressButton: {
+    alignItems: "center",
+    backgroundColor: "skyblue",
+    padding: 10
+  },
+  ProfileButton: {
+    alignItems: "center",
+    backgroundColor: "powderblue",
+    padding: 10
+  }
+});
 
 export default AccountDetails;
