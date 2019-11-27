@@ -10,11 +10,10 @@ import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import Icon from "react-native-vector-icons/SimpleLineIcons";
-import { loginUserService } from "../../../redux/services/user";
+import { loginUserService, getAccessToken } from "../../../redux/services/user";
 import { Input, Button } from "../../../components";
 import styles from "./styles";
 import { Alert, AsyncStorage } from "react-native";
-
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
@@ -39,30 +38,45 @@ const loginSchema = Yup.object().shape({
 });
 
 class Login extends Component<Props, {}> {
-
-  isValidCredentials= function(){
+  isValidCredentials = function() {
     let isValid = AsyncStorage.getItem("userToken");
-    console.log("****"+isValid);
-    return isValid != undefined
-  }
+    console.log("****" + isValid);
+    return isValid != undefined;
+  };
 
   handleLogin = (values: userData) => {
     const { navigation } = this.props;
-    loginUserService(values.username, values.password).then(res => {
-      if(res["errorCode"]==undefined || res["errorCode"]==""){
-        //let userToken = `${values.username}${values.password}`;
-        AsyncStorage.setItem("userToken",  JSON.stringify(res));
-        navigation.navigate("AppStack");
-      }else{
-        Alert.alert(res["errorMessage"]);
-        //navigation.navigate("RegistrationStack");
-      }
 
+    getAccessToken().then(response => {
+      // get the oauth token first
+      // npm run web will not working due to cross Origin issue.Hence run it using npm run android
+      if (response["error"] == undefined || response["error"] == "") {
+        // now login .. actually this api should be not be protected by oauth
+        console.log("oauth token is " + response["access_token"]);
+        AsyncStorage.setItem("accessToken", response["access_token"]);
+        let accessToken = response["access_token"];
+
+        loginUserService(values.username, values.password, accessToken).then(
+          res => {
+            if (res["errorCode"] == undefined || res["errorCode"] == "") {
+              AsyncStorage.setItem("userToken", JSON.stringify(res));
+              Alert.alert("Logged in Successfully");
+              navigation.navigate("AppStack");
+            } else {
+              Alert.alert(res["errorMessage"]);
+            }
+          }
+        );
+      } else {
+        Alert.alert(
+          "Failed to get oauth token. Note this meesage should be removed afterwards"
+        );
+      }
     });
   };
 
   render() {
-  //  const { navigation } = this.props;
+    //  const { navigation } = this.props;
     return (
       <View style={styles.container}>
         <KeyboardAvoidingView
@@ -75,11 +89,9 @@ class Login extends Component<Props, {}> {
               onSubmit={values => this.handleLogin(values)}
             >
               {props => {
-
                 return (
                   <View>
-
-                    <View  style={styles.headStyle}>
+                    <View style={styles.headStyle}>
                       <Icon name="emotsmile" size={100} />
                       <Text style={styles.headText}>
                         Build Something Amazing
@@ -103,9 +115,13 @@ class Login extends Component<Props, {}> {
                         error={props.touched.password && props.errors.password}
                       />
                       <Button text="Login" onPress={props.handleSubmit} />
-                      <Button text="Sign up" onPress={ () => this.props.navigation.navigate("RegistrationStack")} />
+                      <Button
+                        text="Sign up"
+                        onPress={() =>
+                          this.props.navigation.navigate("RegistrationStack")
+                        }
+                      />
                     </View>
-
                   </View>
                 );
               }}
