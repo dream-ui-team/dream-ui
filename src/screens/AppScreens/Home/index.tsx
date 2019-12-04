@@ -48,15 +48,11 @@ class Home extends Component<Props, HomeState> {
       searchTerm: "",
       accessToken: ""
     }),
-      AsyncStorage.getItem("accessToken").then(token => {
-        console.log("found the token in store " + token);
-        this.setState({ accessToken: token });
-        getAllLocationsService(token)
-          .then(res => {
-            this.setState({ locations: res });
-          })
-          .catch(console.log);
-      });
+      getAllLocationsService()
+        .then(res => {
+          this.setState({ locations: res });
+        })
+        .catch(console.log);
   }
 
   searchUpdated(term) {

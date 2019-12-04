@@ -14,6 +14,7 @@ import { loginUserService, getAccessToken } from "../../../redux/services/user";
 import { Input, Button } from "../../../components";
 import styles from "./styles";
 import { Alert, AsyncStorage } from "react-native";
+import moment from "moment";
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
@@ -51,22 +52,33 @@ class Login extends Component<Props, {}> {
       // get the oauth token first
       // npm run web will not working due to cross Origin issue.Hence run it using npm run android
       if (response["error"] == undefined || response["error"] == "") {
-        // now login .. actually this api should be not be protected by oauth
-        console.log("oauth token is " + response["access_token"]);
         AsyncStorage.setItem("accessToken", response["access_token"]);
-        let accessToken = response["access_token"];
-
-        loginUserService(values.username, values.password, accessToken).then(
-          res => {
-            if (res["errorCode"] == undefined || res["errorCode"] == "") {
-              AsyncStorage.setItem("userToken", JSON.stringify(res));
-              Alert.alert("Logged in Successfully");
-              navigation.navigate("AppStack");
-            } else {
-              Alert.alert(res["errorMessage"]);
-            }
-          }
+        let tokenExpireIn = response["expires_in"];
+        let tokenExpiryTime = new Date();
+        console.log(
+          "this token will expire in  " +
+            tokenExpireIn +
+            " seconds and current time is " +
+            tokenExpiryTime
         );
+        tokenExpiryTime.setSeconds(
+          tokenExpiryTime.getSeconds() + tokenExpireIn
+        );
+        // this will be used to check if token is expired
+        AsyncStorage.setItem(
+          "accessTokenExpiryTime",
+          tokenExpiryTime.toString()
+        );
+
+        loginUserService(values.username, values.password).then(res => {
+          if (res["errorCode"] == undefined || res["errorCode"] == "") {
+            AsyncStorage.setItem("userToken", JSON.stringify(res));
+            Alert.alert("Logged in Successfully");
+            navigation.navigate("AppStack");
+          } else {
+            Alert.alert(res["errorMessage"]);
+          }
+        });
       } else {
         Alert.alert(
           "Failed to get oauth token. Note this meesage should be removed afterwards"

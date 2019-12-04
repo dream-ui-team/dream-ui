@@ -18,11 +18,64 @@ export function fetchImageService(page?: number, limit?: number) {
   });
 }
 
-export function loginUserService(
-  username: string,
-  password: string,
-  accessToken: string
-) {
+const validateAndGetAccessToken = async () => {
+  const currentToken = await AsyncStorage.getItem("accessToken");
+  const expiryTime = await AsyncStorage.getItem("accessTokenExpiryTime");
+
+  const isValid = new Date(expiryTime) > new Date();
+  console.log("is this token valid:" + isValid);
+  if (isValid) {
+    return currentToken;
+  } else {
+    var headers = new Headers();
+    headers.append(
+      "Authorization",
+      "Basic " + base64.encode(`${urls.clientId}:${urls.clientSecret}`)
+    );
+
+    headers.append("Access-Control-Allow-Origin", "*");
+    headers.append(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PATCH,DELETE,PUT,OPTIONS"
+    );
+    headers.append(
+      "Access-Control-Allow-Headers",
+      "Origin, Content-Type, X-Auth-Token, content-type, Authorization"
+    );
+    headers.append("Access-Control-Max-Age", "3600");
+
+    let formdata = new FormData();
+    formdata.append("username", "tester");
+    formdata.append("password", "tester");
+    formdata.append("grant_type", "password");
+
+    console.log("fetching the token");
+    const tokenResponse = await fetch(`${urls.Base}oauth/token`, {
+      method: "POST",
+      headers: headers,
+      body: formdata
+    });
+    console.log("response received:");
+    const responseJson = await tokenResponse.json();
+
+    AsyncStorage.setItem("accessToken", responseJson["access_token"]);
+    let tokenExpireIn = responseJson["expires_in"];
+    let tokenExpiryTime = new Date();
+    console.log(
+      "this token will expire in  " +
+        tokenExpireIn +
+        " seconds and current time is " +
+        tokenExpiryTime
+    );
+    tokenExpiryTime.setSeconds(tokenExpiryTime.getSeconds() + tokenExpireIn);
+    // this will be used to check if token is expired
+    AsyncStorage.setItem("accessTokenExpiryTime", tokenExpiryTime.toString());
+    return responseJson["access_token"];
+  }
+};
+
+export async function loginUserService(username: string, password: string) {
+  const token = await validateAndGetAccessToken();
   return fetch(
     `${urls.Base}users/login?mobileNum=${encodeURIComponent(
       `${username}`
@@ -31,7 +84,7 @@ export function loginUserService(
       method: "GET",
       headers: {
         Accept: "application/json",
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,PUT,OPTIONS",
@@ -258,12 +311,13 @@ export function userDeleteAddressService(
     });
 }
 
-export function getAllLocationsService(accessToken: string) {
+export async function getAllLocationsService() {
+  const token = await validateAndGetAccessToken();
   return fetch(`${urls.Base}locations`, {
     method: "GET",
     headers: {
       Accept: "application/json",
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,PUT,OPTIONS",
