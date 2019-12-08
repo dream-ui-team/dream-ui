@@ -36,10 +36,15 @@ class SideBar extends Component<Props, {}> {
           title="My Vehicles"
           onPress={() => navigation.navigate("VehicleDetails")}
         />
+		 <ListItem
+          title="My Orders "
+          onPress={() => navigation.navigate("Orders")}
+        />
         <ListItem
           title="Blank Page"
           onPress={() => navigation.navigate("Blank")}
         />
+		
       </View>
     );
   }

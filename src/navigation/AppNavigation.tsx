@@ -9,6 +9,7 @@ const { width } = Dimensions.get("window");
 
 import Home from "../screens/AppScreens/Home";
 import Blank from "../screens/AppScreens/Blank";
+import Orders from "../screens/AppScreens/Orders";
 import AddressDetails from "../screens/AppScreens/AddressDetails";
 import VehicleDetails from "../screens/AppScreens/VehicleDetails";
 import SideBar from "../screens/AppScreens/SideBar";
@@ -67,7 +68,8 @@ const AppStack = createDrawerNavigator(
     AccountDetails: { screen: AccountDetails},
     VehicleDetails: { screen: VehicleDetails },
     AddressDetails: { screen: AddressDetails },
-    Blank: { screen: Blank }
+    Blank: { screen: Blank },
+	Orders:{screen:Orders}
   },
   {
     drawerWidth: width - 50,
