@@ -396,7 +396,6 @@ export async function getCostSheet(partnerId: string) {
       "Sec-Fetch-Mode": "no-cors"
     }
   })
-    .then(res => res.json())
     .then(response => {
       console.log("Successfully downloaded costsheet");
       return response;
