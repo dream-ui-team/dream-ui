@@ -18,66 +18,77 @@ export function fetchImageService(page?: number, limit?: number) {
   });
 }
 
-const validateAndGetAccessToken = async () => {
+/**
+ * This method is used to oauth access token. This method checks if we have a valid
+ * token in asyncstorage. If current token is expired then it will fetch and return
+ * a new access token.
+ */
+const getOauthAccessToken = async () => {
   const currentToken = await AsyncStorage.getItem("accessToken");
   const expiryTime = await AsyncStorage.getItem("accessTokenExpiryTime");
 
-  const isValid = new Date(expiryTime) > new Date();
-  console.log("is this token valid:" + isValid);
-  if (isValid) {
-    return currentToken;
-  } else {
-    var headers = new Headers();
-    headers.append(
-      "Authorization",
-      "Basic " + base64.encode(`${urls.clientId}:${urls.clientSecret}`)
-    );
-
-    headers.append("Access-Control-Allow-Origin", "*");
-    headers.append(
-      "Access-Control-Allow-Methods",
-      "GET,POST,PATCH,DELETE,PUT,OPTIONS"
-    );
-    headers.append(
-      "Access-Control-Allow-Headers",
-      "Origin, Content-Type, X-Auth-Token, content-type, Authorization"
-    );
-    headers.append("Access-Control-Max-Age", "3600");
-
-    let formdata = new FormData();
-    formdata.append("username", "tester");
-    formdata.append("password", "tester");
-    formdata.append("grant_type", "password");
-
-    console.log("fetching the token");
-    const tokenResponse = await fetch(`${urls.Base}oauth/token`, {
-      method: "POST",
-      headers: headers,
-      body: formdata
-    });
-    console.log("response received:");
-    const responseJson = await tokenResponse.json();
-
-    AsyncStorage.setItem("accessToken", responseJson["access_token"]);
-    let tokenExpireIn = responseJson["expires_in"];
-    let tokenExpiryTime = new Date();
-    console.log(
-      "this token will expire in  " +
-        tokenExpireIn +
-        " seconds and current time is " +
-        tokenExpiryTime
-    );
-    tokenExpiryTime.setSeconds(tokenExpiryTime.getSeconds() + tokenExpireIn);
-    // this will be used to check if token is expired
-    AsyncStorage.setItem("accessTokenExpiryTime", tokenExpiryTime.toString());
-    return responseJson["access_token"];
+  if (currentToken != undefined && currentToken != "") {
+    const isValid = new Date(expiryTime) > new Date();
+    console.log("is this token valid:" + isValid);
+    if (isValid) {
+      return currentToken;
+    }
   }
+  var headers = new Headers();
+  headers.append(
+    "Authorization",
+    "Basic " + base64.encode(`${urls.clientId}:${urls.clientSecret}`)
+  );
+
+  headers.append("Access-Control-Allow-Origin", "*");
+  headers.append(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PATCH,DELETE,PUT,OPTIONS"
+  );
+  headers.append(
+    "Access-Control-Allow-Headers",
+    "Origin, Content-Type, X-Auth-Token, content-type, Authorization"
+  );
+  headers.append("Access-Control-Max-Age", "3600");
+
+  let formdata = new FormData();
+  formdata.append("username", "tester");
+  formdata.append("password", "tester");
+  formdata.append("grant_type", "password");
+
+  console.log("fetching the token");
+  const tokenResponse = await fetch(`${urls.Base}/oauth/token`, {
+    method: "POST",
+    headers: headers,
+    body: formdata
+  });
+  console.log("response received:");
+  const responseJson = await tokenResponse.json();
+
+  AsyncStorage.setItem("accessToken", responseJson["access_token"]);
+  let tokenExpireIn = responseJson["expires_in"];
+  let tokenExpiryTime = new Date();
+  console.log(
+    "this token will expire in  " +
+      tokenExpireIn +
+      " seconds and current time is " +
+      tokenExpiryTime
+  );
+  // if there is not expiration time, keeping default expiration time as one month
+  if (tokenExpireIn != undefined && currentToken != "") {
+    tokenExpiryTime.setSeconds(tokenExpiryTime.getSeconds() + tokenExpireIn);
+  } else {
+    tokenExpiryTime.setMonth(tokenExpiryTime.getMonth() + 1);
+  }
+  // this will be used to check if token is expired
+  AsyncStorage.setItem("accessTokenExpiryTime", tokenExpiryTime.toString());
+  return responseJson["access_token"];
 };
 
 export async function loginUserService(username: string, password: string) {
-  const token = await validateAndGetAccessToken();
+  const token = await getOauthAccessToken();
   return fetch(
-    `${urls.Base}users/login?mobileNum=${encodeURIComponent(
+    `${urls.Base}/users/login?mobileNum=${encodeURIComponent(
       `${username}`
     )}&password=${encodeURIComponent(`${password}`)}`,
     {
@@ -103,18 +114,19 @@ export async function loginUserService(username: string, password: string) {
     });
 }
 
-export function userRegistrationService(
+export async function userRegistrationService(
   mobileNum: string,
   password: string,
   firstName: string,
   lastName: string,
   email: string
 ) {
-  console.log(`${firstName}`);
-  return fetch(`${urls.Base}users`, {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/users`, {
     method: "POST",
     headers: {
       Accept: "application/json",
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
@@ -128,64 +140,69 @@ export function userRegistrationService(
   })
     .then(res => res.json())
     .then(response => {
-      console.log("reponse occurred");
+      console.log("User registered successfully");
       return response;
     })
     .catch(error => {
       console.log(error);
-      console.log("error occurred");
+      console.log("Failed to register user " + error);
     });
 }
 
-export function getUserAddressService(userId: String) {
-  return fetch(`${urls.Base}users/${userId}/addresses`, {
+export async function getUserAddressService(userId: String) {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/users/${userId}/addresses`, {
     method: "GET",
     headers: {
       Accept: "application/json",
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json"
     }
   })
     .then(res => res.json())
     .then(response => {
-      console.log("reponse occurred");
+      console.log("Successfully retrieved user addresses");
       return response;
     })
     .catch(error => {
       console.log(error);
-      console.log("error occurred");
+      console.log("Failed to get user addresses " + error);
     });
 }
 
-export function getUserVehicles(userId: String) {
-  return fetch(`${urls.Base}users/vehicles?userId=${userId}`, {
+export async function getUserVehicles(userId: String) {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/users/vehicles?userId=${userId}`, {
     method: "POST",
     headers: {
       Accept: "application/json",
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json"
     }
   })
     .then(res => res.json())
     .then(response => {
-      console.log("reponse occurred");
+      console.log("Successfully retrieved user vehicles");
       return response;
     })
     .catch(error => {
-      console.log("error occurred" + error);
+      console.log("failed to get user vehicles " + error);
     });
 }
 
-export function updateUserProfile(
+export async function updateUserProfile(
   userId: string,
   mobileNumber: string,
   firstName: string,
   lastName: string,
   emailAddress: string
 ) {
-  console.log(`${firstName}`);
-  return fetch(`${urls.Base}users`, {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/users`, {
     method: "PUT",
     headers: {
       Accept: "application/json",
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
@@ -198,16 +215,16 @@ export function updateUserProfile(
   })
     .then(res => res.json())
     .then(response => {
-      console.log("reponse occurred");
+      console.log("successfully updated user profile");
       return response;
     })
     .catch(error => {
       console.log(error);
-      console.log("error occurred");
+      console.log("failed to update user profile " + error);
     });
 }
 
-export function userAddAddressService(
+export async function userAddAddressService(
   addressLine1: string,
   addressLine2: string,
   country: string,
@@ -216,10 +233,12 @@ export function userAddAddressService(
   pinCode: string,
   userId: string
 ) {
-  return fetch(`${urls.Base}users/addresses`, {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/users/addresses`, {
     method: "POST",
     headers: {
       Accept: "application/json",
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
@@ -234,16 +253,16 @@ export function userAddAddressService(
   })
     .then(res => res.json())
     .then(response => {
-      console.log("reponse occurred");
+      console.log("successfully added user address");
       return response;
     })
     .catch(error => {
       console.log(error);
-      console.log("error occurred");
+      console.log("failed to add user address " + error);
     });
 }
 
-export function userUpdateAddressService(
+export async function userUpdateAddressService(
   userAddressId: string,
   addressLine1: string,
   addressLine2: string,
@@ -253,13 +272,12 @@ export function userUpdateAddressService(
   pinCode: string,
   userId: string
 ) {
-  console.log(
-    "in update service" + `${userId}` + " " + `${userAddressId}` + " " + pinCode
-  );
-  return fetch(`${urls.Base}users/${userId}/addresses`, {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/users/${userId}/addresses`, {
     method: "PUT",
     headers: {
       Accept: "application/json",
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
@@ -274,46 +292,72 @@ export function userUpdateAddressService(
   })
     .then(res => res.json())
     .then(response => {
-      console.log("reponse occurred");
+      console.log("successfully updated user address");
       return response;
     })
     .catch(error => {
       console.log(error);
-      console.log("error occurred");
+      console.log("failed to updated user address " + error);
     });
 }
-export function userDeleteAddressService(
+
+export async function userDeleteAddressService(
   userId: string,
   userAddressId: string
 ) {
-  return fetch(
-    `http://192.168.42.86:8090/users/${userId}/addresses/${userAddressId}`,
-    {
-      method: "DELETE",
-      headers: {
-        Accept: "application/plain",
-        //'Content-Type': 'application/json',
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,PUT,OPTIONS",
-        "Access-Control-Allow-Headers":
-          "Origin, Content-Type, X-Auth-Token, content-type, Authorization",
-        "Sec-Fetch-Mode": "no-cors"
-      }
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/users/${userId}/addresses/${userAddressId}`, {
+    method: "DELETE",
+    headers: {
+      Accept: "application/plain",
+      Authorization: `Bearer ${token}`,
+      //'Content-Type': 'application/json',
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,PUT,OPTIONS",
+      "Access-Control-Allow-Headers":
+        "Origin, Content-Type, X-Auth-Token, content-type, Authorization",
+      "Sec-Fetch-Mode": "no-cors"
     }
-  )
+  })
     .then(res => {
-      console.log("reponse occurred");
+      console.log("successfully deleted user address");
       return res;
     })
     .catch(error => {
       console.log(error);
-      console.log("error occurred");
+      console.log("failed to delete user address " + error);
     });
 }
 
 export async function getAllLocationsService() {
-  const token = await validateAndGetAccessToken();
-  return fetch(`${urls.Base}locations`, {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/locations`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,PUT,OPTIONS",
+      "Access-Control-Allow-Headers":
+        "Origin, Content-Type, X-Auth-Token, content-type, Authorization",
+      "Sec-Fetch-Mode": "no-cors"
+    }
+  })
+    .then(res => res.json())
+    .then(response => {
+      console.log("successfully fetched all the locations");
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+      console.log("failed to get all the location " + error);
+    });
+}
+
+export async function getServiceCentresByLocationId(locationId: string) {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/partners/locations/${locationId}`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -337,15 +381,13 @@ export async function getAllLocationsService() {
     });
 }
 
-export function getServiceCentresByLocationId(
-  locationId: string,
-  accessToken: string
-) {
-  return fetch(`${urls.Base}partners/locations/${locationId}`, {
+export async function getCostSheet(partnerId: string) {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/partners/${partnerId}/services/1/costsheets`, {
     method: "GET",
     headers: {
       Accept: "application/json",
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,PUT,OPTIONS",
@@ -356,41 +398,19 @@ export function getServiceCentresByLocationId(
   })
     .then(res => res.json())
     .then(response => {
-      console.log("reponse occurred");
+      console.log("Successfully downloaded costsheet");
       return response;
     })
     .catch(error => {
       console.log(error);
-      console.log("error occurred");
-    });
-}
-
-export function getCostSheet(partnerId: string) {
-  return fetch(`${urls.Base}partners/${partnerId}/services/1/costsheets`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,PUT,OPTIONS",
-      "Access-Control-Allow-Headers":
-        "Origin, Content-Type, X-Auth-Token, content-type, Authorization",
-      "Sec-Fetch-Mode": "no-cors"
-    }
-  })
-    .then(res => res.json())
-    .then(response => {
-      console.log("reponse occurred");
-      return response;
-    })
-    .catch(error => {
-      console.log(error);
-      console.log("error occurred");
+      console.log("failed to download costsheet " + error);
     });
 }
 
 export function logoutUserService() {
   return new Promise((resolve, reject) => {
+    AsyncStorage.removeItem("accessToken");
+    AsyncStorage.removeItem("accessTokenExpiryTime");
     AsyncStorage.removeItem("userToken")
       .then(() => {
         resolve();
@@ -399,36 +419,4 @@ export function logoutUserService() {
         reject(error);
       });
   });
-}
-
-export async function getAccessToken() {
-  var headers = new Headers();
-  headers.append(
-    "Authorization",
-    "Basic " + base64.encode(`${urls.clientId}:${urls.clientSecret}`)
-  );
-
-  headers.append("Access-Control-Allow-Origin", "*");
-  headers.append(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PATCH,DELETE,PUT,OPTIONS"
-  );
-  headers.append(
-    "Access-Control-Allow-Headers",
-    "Origin, Content-Type, X-Auth-Token, content-type, Authorization"
-  );
-  headers.append("Access-Control-Max-Age", "3600");
-
-  let formdata = new FormData();
-  formdata.append("username", "tester");
-  formdata.append("password", "tester");
-  formdata.append("grant_type", "password");
-
-  const tokenResponse = await fetch(`${urls.Base}oauth/token`, {
-    method: "POST",
-    headers: headers,
-    body: formdata
-  });
-  const responseJson = await tokenResponse.json();
-  return responseJson;
 }

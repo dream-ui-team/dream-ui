@@ -31,7 +31,6 @@ interface HomeState {
   serviceCentresBackup: [];
   isNotNull: boolean;
   searchTerm: string;
-  accessToken: string;
 }
 
 class Home extends Component<Props, HomeState> {
@@ -45,8 +44,7 @@ class Home extends Component<Props, HomeState> {
       serviceCentres: [],
       serviceCentresBackup: [],
       isNotNull: false,
-      searchTerm: "",
-      accessToken: ""
+      searchTerm: ""
     }),
       getAllLocationsService()
         .then(res => {
@@ -64,11 +62,9 @@ class Home extends Component<Props, HomeState> {
     if (itemValue != "NULL") {
       this.state.locationId = itemValue;
       this.setState({ isNotNull: false });
-      getServiceCentresByLocationId(
-        this.state.locationId,
-        this.state.accessToken
-      )
+      getServiceCentresByLocationId(this.state.locationId)
         .then(res => {
+          // handle usecase where there are no service centers for selected location
           this.setState({ serviceCentres: res });
           this.state.serviceCentresBackup = [];
           this.setState({ serviceCentresBackup: this.state.serviceCentres });
