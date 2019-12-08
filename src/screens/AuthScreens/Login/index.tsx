@@ -63,9 +63,7 @@ class Login extends Component<Props, {}> {
     //  const { navigation } = this.props;
     return (
       <View style={styles.container}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
+        <KeyboardAvoidingView behavior="padding">
           <ScrollView bounces={false}>
             <Formik
               initialValues={{ mobileNumber: "", password: "" }}
