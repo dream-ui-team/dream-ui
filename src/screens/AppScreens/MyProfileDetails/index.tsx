@@ -1,22 +1,24 @@
 import React, { Component } from "react";
-import { View,
+import {
+  View,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   AsyncStorage,
   Alert,
-  TextInput,
-  Text  } from "react-native";
+  Text
+} from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
-import { connect } from "react-redux";
+
 import { Formik } from "formik";
 import { Header } from "../../../components";
-import { AvatarItem,Input, Button } from "../../../components";
-import { logoutUserService, updateUserProfile } from "../../../redux/services/user";
-import {NavigationEvents} from 'react-navigation';
+import { Input, Button } from "../../../components";
+import {
+  logoutUserService,
+  updateUserProfile
+} from "../../../redux/services/user";
+
 import styles from "./styles";
-
-
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
@@ -30,64 +32,62 @@ interface MyProfileData {
   userId: string;
 }
 
-class MyProfileDetails extends Component<Props, State> {
-
+class MyProfileDetails extends Component<Props, {}> {
   constructor(props: Props) {
     super(props);
-    this.state ={
-      values: this.props.navigation.getParam("values","NO-ID")
-    }
+    this.state = {
+      values: this.props.navigation.getParam("values", "NO-ID")
+    };
   }
 
-
- handleProfileUpdate = (values: MyProfileData) => {
-   console.log("Updating user info"+values.userId);
-   updateUserProfile(values.userId,values.mobileNumber,values.firstName,values.lastName,values.emailAddress)
-     .then( res => {
-       if(res["errorCode"]==undefined || res["errorCode"]==""){
-         //let userToken = `${values.username}${values.password}`;
-         AsyncStorage.setItem("userToken",  JSON.stringify(values));
-         Alert.alert("Successfully updated user information")
-         this.props.navigation.navigate("AppStack");
-       }else{
-         Alert.alert(res["errorMessage"]);
-         //navigation.navigate("RegistrationStack");
-       }
-     });
-  }
+  handleProfileUpdate = (values: MyProfileData) => {
+    console.log("Updating user info" + values.userId);
+    updateUserProfile(
+      values.userId,
+      values.mobileNumber,
+      values.firstName,
+      values.lastName,
+      values.emailAddress
+    ).then(res => {
+      if (res["errorCode"] == undefined || res["errorCode"] == "") {
+        //let userToken = `${values.username}${values.password}`;
+        AsyncStorage.setItem("userToken", JSON.stringify(values));
+        Alert.alert("Successfully updated user information");
+        this.props.navigation.navigate("AppStack");
+      } else {
+        Alert.alert(res["errorMessage"]);
+      }
+    });
+  };
 
   handleLogout = () => {
     const { navigation } = this.props;
     logoutUserService().then(() => {
-      navigation.navigate("AuthStack");
+      navigation.navigate("Login");
     });
-  }
+  };
 
   render() {
-
     return (
       <View style={styles.container}>
-      <Header
-        title="My Profile details"
-        leftButtonPress={() => navigation.openDrawer()}
-        rightButtonPress={() => this.handleLogout()}
-      />
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
+        <Header
+          title="My Profile details"
+          leftButtonPress={() => this.props.navigation.openDrawer()}
+          rightButtonPress={() => this.handleLogout()}
+        />
+        <KeyboardAvoidingView behavior="padding">
           <ScrollView bounces={false}>
             <Formik
               initialValues={{
-                 firstName: `${this.state.values.firstName}`,
-                 lastName:`${this.state.values.lastName}`,
-                 emailAddress:`${this.state.values.emailAddress}`,
-                 mobileNumber:`${this.state.values.mobileNumber}`,
-                 userId:`${this.state.values.userId}`,
-                 }}
-
+                firstName: `${this.state.values.firstName}`,
+                lastName: `${this.state.values.lastName}`,
+                emailAddress: `${this.state.values.emailAddress}`,
+                mobileNumber: `${this.state.values.mobileNumber}`,
+                userId: `${this.state.values.userId}`
+              }}
               onSubmit={values => this.handleProfileUpdate(values)}
             >
-              { props => {
+              {props => {
                 return (
                   <View>
                     <View style={styles.inputContainer}>
@@ -97,14 +97,16 @@ class MyProfileDetails extends Component<Props, State> {
                         value={props.values.firstName}
                         onChangeText={props.handleChange("firstName")}
                         //onBlur={props.handleBlur("firstName")}
-                        error={props.touched.firstName && props.errors.firstName}
+                        error={
+                          props.touched.firstName && props.errors.firstName
+                        }
                       />
                       <Text>Last name:</Text>
                       <Input
                         placeholder="Last name"
                         value={props.values.lastName}
                         onChangeText={props.handleChange("lastName")}
-                       //onBlur={props.handleBlur("lastName")}
+                        //onBlur={props.handleBlur("lastName")}
                         error={props.touched.lastName && props.errors.lastName}
                       />
                       <Text>Email:</Text>
@@ -113,7 +115,10 @@ class MyProfileDetails extends Component<Props, State> {
                         value={props.values.emailAddress}
                         onChangeText={props.handleChange("emailAddress")}
                         //onBlur={props.handleBlur("email")}
-                        error={props.touched.emailAddress && props.errors.emailAddress}
+                        error={
+                          props.touched.emailAddress &&
+                          props.errors.emailAddress
+                        }
                       />
                       <Text>mobile Number:</Text>
                       <Input
@@ -121,11 +126,16 @@ class MyProfileDetails extends Component<Props, State> {
                         value={props.values.mobileNumber}
                         onChangeText={props.handleChange("mobileNumber")}
                         //onBlur={props.handleBlur("mobileNum")}
-                        error={props.touched.mobileNumber && props.errors.mobileNumber}
+                        error={
+                          props.touched.mobileNumber &&
+                          props.errors.mobileNumber
+                        }
                       />
 
-                      <Button text="Update my profile" onPress={props.handleSubmit} />
-
+                      <Button
+                        text="Update my profile"
+                        onPress={props.handleSubmit}
+                      />
                     </View>
                   </View>
                 );

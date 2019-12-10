@@ -1,12 +1,9 @@
 import React from "react";
-import { createAppContainer,createSwitchNavigator } from "react-navigation";
+import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import { createDrawerNavigator } from "react-navigation-drawer";
 
 import { Dimensions } from "react-native";
-
-const { width } = Dimensions.get("window");
-
 import Home from "../screens/AppScreens/Home";
 import Blank from "../screens/AppScreens/Blank";
 import Orders from "../screens/AppScreens/Orders";
@@ -22,9 +19,19 @@ import AddAddress from "../screens/AppScreens/AddressDetails/AddAddress";
 import ServiceCenterDetails from "../screens/AppScreens/Home/ServiceCenterDetails";
 import OrderRequest from "../screens/AppScreens/Home/OrderRequest";
 
+const { width } = Dimensions.get("window");
+
+// this stack will store every page in app
+// except screen such as login/registration/forgot-password
 const MainStack = createStackNavigator(
   {
-    Home: { screen: Home }
+    // key is used in navigation.navigate() function
+    // key: component-name
+    Home: Home,
+    MyProfileDetails: MyProfileDetails,
+    AddAddress: AddAddress,
+    ServiceCenterDetails: ServiceCenterDetails,
+    OrderRequest: OrderRequest
   },
   {
     initialRouteName: "Home",
@@ -32,9 +39,12 @@ const MainStack = createStackNavigator(
   }
 );
 
+// this stack will have all pages related to
+// user authentication
 const AuthStack = createStackNavigator(
   {
-    Login: { screen: Login }
+    Login: Login,
+    Registration: Registration
   },
   {
     initialRouteName: "Login",
@@ -42,34 +52,14 @@ const AuthStack = createStackNavigator(
   }
 );
 
-const RegistrationStack = createStackNavigator(
-  {
-    Registration: { screen: Registration }
-  },
-  {
-    initialRouteName: "Registration",
-    headerMode: "none"
-  }
-);
-
-const MyProfileDetailsStack = createStackNavigator(
-  {
-    MyProfileDetails: { screen: MyProfileDetails }
-  },
-  {
-    initialRouteName: "MyProfileDetails",
-    headerMode: "none"
-  }
-);
-
 const AppStack = createDrawerNavigator(
   {
-    MainStack: { screen: MainStack },
-    AccountDetails: { screen: AccountDetails},
-    VehicleDetails: { screen: VehicleDetails },
-    AddressDetails: { screen: AddressDetails },
-    Blank: { screen: Blank },
-	Orders:{screen:Orders}
+    MainStack: MainStack,
+    AccountDetails: AccountDetails,
+    VehicleDetails: VehicleDetails,
+    AddressDetails: AddressDetails,
+    Blank: Blank,
+    Orders: Orders
   },
   {
     drawerWidth: width - 50,
@@ -83,13 +73,8 @@ export default createAppContainer(
     {
       AuthLoading: AuthLoading,
       AuthStack: AuthStack,
-      RegistrationStack: RegistrationStack,
-      MyProfileDetails: MyProfileDetails,
       AppStack: AppStack,
-	  AddAddress:{screen:AddAddress},
-	  ServiceCenterDetails:{screen:ServiceCenterDetails},
-	  OrderRequest:{screen:OrderRequest}
-      
+      MainStack: MainStack
     },
     {
       initialRouteName: "AuthLoading"

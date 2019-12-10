@@ -57,10 +57,10 @@ class Registration extends Component<Props, {}> {
         //  );
         console.log("Registration successful");
         Alert.alert("Registration successful. Please relogin");
-        navigation.navigate("AuthStack");
+        navigation.navigate("Login");
       } else if (res["errorCode"] == 20003 || res["errorCode"] == 20004) {
         console.log("user already exists with email or mobileNum");
-        navigation.navigate("AuthStack");
+        navigation.navigate("Login");
         Alert.alert(res["errorMessage"]);
       } else {
         console.log("user already exists with email");
@@ -136,9 +136,7 @@ class Registration extends Component<Props, {}> {
                       <Button text="Sign up" onPress={props.handleSubmit} />
                       <Button
                         text="Login"
-                        onPress={() =>
-                          this.props.navigation.navigate("AuthStack")
-                        }
+                        onPress={() => this.props.navigation.navigate("Login")}
                       />
                     </View>
                   </View>

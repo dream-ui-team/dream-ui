@@ -103,7 +103,7 @@ class Login extends Component<Props, {}> {
                       <Button
                         text="Sign up"
                         onPress={() =>
-                          this.props.navigation.navigate("RegistrationStack")
+                          this.props.navigation.navigate("Registration")
                         }
                       />
                     </View>
