@@ -63,7 +63,7 @@ class MyProfileDetails extends Component<Props, {}> {
   handleLogout = () => {
     const { navigation } = this.props;
     logoutUserService().then(() => {
-      navigation.navigate("Login");
+      navigation.navigate("AuthStack");
     });
   };
 

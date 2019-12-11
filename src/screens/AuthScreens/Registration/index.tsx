@@ -1,11 +1,5 @@
 import React, { Component } from "react";
-import {
-  View,
-  Text,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform
-} from "react-native";
+import { View, Text, KeyboardAvoidingView, ScrollView } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -13,7 +7,7 @@ import Icon from "react-native-vector-icons/SimpleLineIcons";
 import { userRegistrationService } from "../../../redux/services/user";
 import { Input, Button } from "../../../components";
 import styles from "./styles";
-import { Alert, AsyncStorage } from "react-native";
+import { Alert } from "react-native";
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
@@ -25,14 +19,6 @@ interface userData {
   email: string;
   password: string;
 }
-
-const loginSchema = Yup.object().shape({
-  email: Yup.string()
-    .matches(/^[0-9]+$/)
-    .min(10)
-    .max(10)
-    .required()
-});
 
 class Registration extends Component<Props, {}> {
   handleRegistration = (values: userData) => {

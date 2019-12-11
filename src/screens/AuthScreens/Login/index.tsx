@@ -1,11 +1,5 @@
 import React, { Component } from "react";
-import {
-  View,
-  Text,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform
-} from "react-native";
+import { View, Text, KeyboardAvoidingView, ScrollView } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -14,7 +8,6 @@ import { loginUserService } from "../../../redux/services/user";
 import { Input, Button } from "../../../components";
 import styles from "./styles";
 import { Alert, AsyncStorage } from "react-native";
-import moment from "moment";
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
@@ -82,7 +75,7 @@ class Login extends Component<Props, {}> {
 
                     <View style={styles.inputContainer}>
                       <Input
-                        placeholder="mobileNumber"
+                        placeholder="mobile number"
                         value={props.values.mobileNumber}
                         onChangeText={props.handleChange("mobileNumber")}
                         onBlur={props.handleBlur("mobileNumber")}
@@ -92,7 +85,7 @@ class Login extends Component<Props, {}> {
                         }
                       />
                       <Input
-                        placeholder="Password"
+                        placeholder="password"
                         value={props.values.password}
                         onChangeText={props.handleChange("password")}
                         onBlur={props.handleBlur("password")}

@@ -1,42 +1,43 @@
 import React, { Component } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
-import { Formik } from "formik";
-import * as Yup from "yup";
-import Icon from "react-native-vector-icons/SimpleLineIcons";
-import { Input, Button, Header } from "../../../components";
-import { Alert, AsyncStorage } from "react-native";
+import { Header } from "../../../components";
+import { AsyncStorage } from "react-native";
+import { logoutUserService } from "../../../redux/services/user";
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
 }
 
-class AccountDetails extends Component<Props, {}> {
+interface MyProfileData {
+  firstName: string;
+  lastName: string;
+  mobileNumber: number;
+  emailAddress: string;
+  userId: string;
+}
+
+class AccountDetails extends Component<Props, { MyProfileData }> {
   constructor(props) {
     //
     super(props);
     this.state = {
-      values: []
+      MyProfileData: []
     };
   }
 
   componentDidMount() {
-    AsyncStorage.getItem("userToken")
-      .then(value => {
-        this.setState({ values: JSON.parse(value) });
-      })
-      .then(res => {
-        console.log("values are:" + this.state.values.firstName);
-      });
+    AsyncStorage.getItem("userToken").then(value => {
+      this.setState({ MyProfileData: JSON.parse(value) });
+    });
   }
+
+  handleLogout = () => {
+    const { navigation } = this.props;
+    logoutUserService().then(() => {
+      navigation.navigate("AuthStack");
+    });
+  };
 
   render() {
     const { navigation } = this.props;
@@ -47,27 +48,30 @@ class AccountDetails extends Component<Props, {}> {
           leftButtonPress={() => navigation.openDrawer()}
           rightButtonPress={() => this.handleLogout()}
         />
+
         <TouchableOpacity
           style={styles.ProfileButton}
           onPress={() =>
-            this.props.navigation.navigate("MyProfileDetails", {
-              values: this.state.values
+            navigation.navigate("MyProfileDetails", {
+              values: this.state.MyProfileData
             })
           }
         >
           <Text> My profile </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.AddressButton}
           onPress={() => this.props.navigation.navigate("AddressDetails")}
         >
-          <Text> My address </Text>
+          <Text> My addresses </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.ProfileButton}
           onPress={() => navigation.navigate("VehicleDetails")}
         >
-          <Text> My Vehicles </Text>
+          <Text> My vehicles </Text>
         </TouchableOpacity>
       </View>
     );
