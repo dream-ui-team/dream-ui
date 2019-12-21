@@ -372,7 +372,7 @@ export async function getServiceCentresByLocationId(locationId: string) {
   })
     .then(res => res.json())
     .then(response => {
-      console.log("reponse occurred");
+      console.log("fatch parnters for given location");
       return response;
     })
     .catch(error => {

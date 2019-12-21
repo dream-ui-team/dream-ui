@@ -1,15 +1,9 @@
 import React, { Component } from "react";
-import {
-  View,
-  FlatList,
-  Picker,
-  Text,
-  TouchableOpacity,
-  AsyncStorage
-} from "react-native";
+import { View, FlatList, Picker, Text, TouchableOpacity } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Header } from "../../../components";
 import styles from "./styles";
+import PartnerItem from "./PartnerItem";
 
 import {
   logoutUserService,
@@ -23,14 +17,26 @@ interface Props {
   navigation: NavigationScreenProp<NavigationState>;
 }
 
+interface ParterDetails {
+  partnerId: string;
+  name: string;
+  emailAddress: string;
+  alternateMobileNumber: number;
+  address: string;
+  mobileNumber: number;
+}
+
 interface HomeState {
-  locationId: string;
-  locations: [];
-  pickerList: [];
-  serviceCentres: [];
   serviceCentresBackup: [];
-  isNotNull: boolean;
+  partners: ParterDetails[];
+  places: Place[];
+  selectedPlaceId: string;
   searchTerm: string;
+}
+
+interface Place {
+  locationId: string;
+  locationName: string;
 }
 
 class Home extends Component<Props, HomeState> {
@@ -38,43 +44,36 @@ class Home extends Component<Props, HomeState> {
     super(props);
     this.getServiceCentres = this.getServiceCentres.bind(this);
     (this.state = {
-      locationId: "",
-      locations: [],
-      pickerList: [],
-      serviceCentres: [],
       serviceCentresBackup: [],
-      isNotNull: false,
+      partners: [],
+      places: [],
+      selectedPlaceId: "",
       searchTerm: ""
     }),
       getAllLocationsService()
         .then(res => {
-          this.setState({ locations: res });
+          this.setState({ places: res });
         })
         .catch(console.log);
   }
 
   searchUpdated(term) {
-    this.state.serviceCentres = this.state.serviceCentresBackup;
-    this.setState({ searchTerm: term });
+    this.setState({
+      searchTerm: term,
+      partners: this.state.serviceCentresBackup
+    });
   }
 
-  getServiceCentres = itemValue => {
-    if (itemValue != "NULL") {
-      this.state.locationId = itemValue;
-      this.setState({ isNotNull: false });
-      getServiceCentresByLocationId(this.state.locationId)
-        .then(res => {
-          // handle usecase where there are no service centers for selected location
-          this.setState({ serviceCentres: res });
-          this.state.serviceCentresBackup = [];
-          this.setState({ serviceCentresBackup: this.state.serviceCentres });
-          this.setState({ isNotNull: true });
-        })
-        .catch(console.log);
-    } else {
-      this.setState({ isNotNull: false });
-    }
-  };
+  getServiceCentres(placeId: string) {
+    getServiceCentresByLocationId(placeId)
+      .then(res => {
+        this.setState({
+          partners: res,
+          serviceCentresBackup: res
+        });
+      })
+      .catch(console.log);
+  }
 
   handleLogout = () => {
     const { navigation } = this.props;
@@ -84,30 +83,23 @@ class Home extends Component<Props, HomeState> {
   };
 
   render() {
-    if (this.state.isNotNull && this.state.searchTerm != "") {
-      var search = this.state.searchTerm.toString();
-      this.state.serviceCentres = this.state.serviceCentres.filter(function(
-        hero
-      ) {
-        return hero.name.toLowerCase().includes(search.toLowerCase());
-      });
-    } else if (this.state.isNotNull) {
-      this.state.serviceCentres = this.state.serviceCentresBackup;
-    }
     const { navigation } = this.props;
-
-    this.state.pickerList = [];
-    this.state.pickerList.push(
-      <Picker.Item key={"NULL"} label={"Select Your Area"} value={"NULL"} />
-    );
-    for (var i = 0; i < this.state.locations.length; i++) {
-      this.state.pickerList.push(
+    let places = this.state.places.map(p => {
+      return (
         <Picker.Item
-          key={this.state.locations[i].locationId}
-          label={this.state.locations[i].locationName}
-          value={this.state.locations[i].locationId}
+          key={p.locationId}
+          label={p.locationName}
+          value={p.locationId}
         />
       );
+    });
+    if (this.state.searchTerm != "") {
+      var search = this.state.searchTerm.toString();
+      var filteredPartners = this.state.partners.filter(function(partner) {
+        return partner.name.toLowerCase().includes(search.toLowerCase());
+      });
+      this.state.partners = filteredPartners;
+      this.state.searchTerm = "";
     }
 
     return (
@@ -120,12 +112,13 @@ class Home extends Component<Props, HomeState> {
         <View style={styles.pickerContainer}>
           <Picker
             style={styles.pickerStyle}
-            selectedValue={this.state.locationId}
-            onValueChange={(itemValue, itemPosition) =>
-              this.getServiceCentres(itemValue)
-            }
+            selectedValue={this.state.selectedPlaceId}
+            onValueChange={(value, index) => {
+              this.setState({ selectedPlaceId: value });
+              this.getServiceCentres(value);
+            }}
           >
-            {this.state.pickerList}
+            {places}
           </Picker>
         </View>
         <SearchInput
@@ -135,54 +128,23 @@ class Home extends Component<Props, HomeState> {
           style={styles.searchInput}
           placeholder="Enter service centre name"
         />
-        {this.state.isNotNull ? (
+        {this.state.partners.length > 0 ? (
           <FlatList
-            data={this.state.serviceCentres}
-            keyExtractor={(x, i) => i.toString()}
+            data={this.state.partners}
+            keyExtractor={item => item.partnerId}
             renderItem={({ item }) => (
               <View style={styles.homeContainer}>
-                <View style={styles.homeContainerRow}>
-                  <View style={styles.label}>
-                    <Text style={styles.text}>Name:</Text>
-                  </View>
-                  <View style={styles.data}>
-                    <Text style={styles.text}>{item.name}</Text>
-                  </View>
-                </View>
-                <View style={styles.homeContainerRow}>
-                  <View style={styles.label}>
-                    <Text style={styles.text}>Address:</Text>
-                  </View>
-                  <View style={styles.data}>
-                    <Text style={styles.text}>{item.address}</Text>
-                  </View>
-                </View>
-                <View style={styles.homeContainerRow}>
-                  <View style={styles.label}>
-                    <Text style={styles.text}>Email Address:</Text>
-                  </View>
-                  <View style={styles.data}>
-                    <Text style={styles.text}>{item.emailAddress}</Text>
-                  </View>
-                </View>
-                <View style={styles.homeContainerRow}>
-                  <View style={styles.label}>
-                    <Text style={styles.text}>Mobile Number:</Text>
-                  </View>
-                  <View style={styles.data}>
-                    <Text style={styles.text}>{item.mobileNumber}</Text>
-                  </View>
-                </View>
-                <View style={styles.homeContainerRow}>
-                  <View style={styles.label}>
-                    <Text style={styles.text}>Alternate Mobile Number:</Text>
-                  </View>
-                  <View style={styles.data}>
-                    <Text style={styles.text}>
-                      {item.alternateMobileNumber}
-                    </Text>
-                  </View>
-                </View>
+                <PartnerItem label="Name" data={item.name} />
+                <PartnerItem label="Address" data={item.address} />
+                <PartnerItem label="Email Address" data={item.emailAddress} />
+                <PartnerItem
+                  label="Contact No.1"
+                  data={item.mobileNumber.toString()}
+                />
+                <PartnerItem
+                  label="Contact No.2"
+                  data={item.alternateMobileNumber.toString()}
+                />
                 <View style={{ marginTop: 10 }}></View>
                 <View style={styles.homeContainerRow}>
                   <View style={styles.updateButton}>
