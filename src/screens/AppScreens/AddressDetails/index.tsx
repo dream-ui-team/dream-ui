@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import {
   View,
   FlatList,
-  ActivityIndicator,
   AsyncStorage,
   Text,
   StyleSheet,
@@ -10,27 +9,41 @@ import {
   Button
 } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
-import { connect } from "react-redux";
-import { Header } from "../../../components";
 import styles from "./styles";
-import { AvatarItem, Input, CommonButton } from "../../../components";
+import { CommonButton } from "../../../components";
 import {
   logoutUserService,
   getUserAddressService,
   userDeleteAddressService
 } from "../../../redux/services/user";
-import { NavigationEvents } from "react-navigation";
 import { colors } from "../../../constants";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import AddressFlatList from "./AddressFlatList";
+
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
+  newAdress: UserAdress;
 }
 
-interface itemProp {
-  item: any;
+interface UserAdress {
+  userAddressId: string;
+  addressLine1: string;
+  addressLine2: string;
+  state: string;
+  city: string;
+  country: string;
+  pincode: string;
+  mobileNumber: string;
 }
 
-class AddressDetails extends Component<Props, State> {
+interface AddressState {
+  page: number;
+  limit: number;
+  values: string;
+  addresses: UserAdress[];
+}
+
+class AddressDetails extends Component<Props, AddressState> {
   constructor(props: Props) {
     super(props);
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
@@ -44,6 +57,11 @@ class AddressDetails extends Component<Props, State> {
     };
   }
 
+  updateAddresses(address: UserAdress) {
+    console.log("pushing a address");
+    this.state.addresses.push(address);
+  }
+
   deleteAddress = item => {
     userDeleteAddressService(this.state.values.userId, item.userAddressId)
       .then(res => {
@@ -55,7 +73,6 @@ class AddressDetails extends Component<Props, State> {
   };
 
   componentDidMount() {
-    console.log("mounted");
     AsyncStorage.getItem("userToken")
       .then(value => {
         this.setState({ values: JSON.parse(value) });
@@ -65,7 +82,6 @@ class AddressDetails extends Component<Props, State> {
         getUserAddressService(this.state.values.userId)
           .then(res => {
             this.setState({ addresses: res });
-            console.log(this.state.addresses);
           })
           .catch(console.log);
       });
@@ -82,6 +98,7 @@ class AddressDetails extends Component<Props, State> {
     this.props.navigation.navigate("AccountDetails");
     return true;
   }
+
   render() {
     const { navigation } = this.props;
     return (
@@ -96,84 +113,27 @@ class AddressDetails extends Component<Props, State> {
             </TouchableOpacity>
           </View>
           <View style={styles1.midContainer}>
-            <Text style={styles1.headerTitle}>{`Profile Details`}</Text>
+            <Text style={styles1.headerTitle}>{`Address Details`}</Text>
           </View>
         </View>
-        <View style={styles1.container}>
-          <Button
-            title="Add New Address"
-            color="#3F51B5"
-            onPress={() => navigation.navigate("AddAddress")}
-          />
-        </View>
+
         <View style={styles1.item_separator} />
         <FlatList
           data={this.state.addresses}
           keyExtractor={(x, i) => i.toString()}
           renderItem={({ item }) => (
             <View style={styles.addressContainer}>
-              <View style={styles.addressContainerRow}>
-                <View style={styles.label}>
-                  <Text style={styles.text}>Name:</Text>
-                </View>
-                <View style={styles.data}>
-                  <Text
-                    style={styles.text}
-                  >{`${this.state.values.firstName} ${this.state.values.lastName}`}</Text>
-                </View>
-              </View>
-              <View style={styles.addressContainerRow}>
-                <View style={styles.label}>
-                  <Text style={styles.text}>Address Line1:</Text>
-                </View>
-                <View style={styles.data}>
-                  <Text style={styles.text}>{item.addressLine1}</Text>
-                </View>
-              </View>
-              <View style={styles.addressContainerRow}>
-                <View style={styles.label}>
-                  <Text style={styles.text}>Address Line2:</Text>
-                </View>
-                <View style={styles.data}>
-                  <Text style={styles.text}>{item.addressLine2}</Text>
-                </View>
-              </View>
-              <View style={styles.addressContainerRow}>
-                <View style={styles.label}>
-                  <Text style={styles.text}>State:</Text>
-                </View>
-                <View style={styles.data}>
-                  <Text style={styles.text}>{item.state}</Text>
-                </View>
-              </View>
-              <View style={styles.addressContainerRow}>
-                <View style={styles.label}>
-                  <Text style={styles.text}>City:</Text>
-                </View>
-                <View style={styles.data}>
-                  <Text style={styles.text}>{item.city}</Text>
-                </View>
-              </View>
-              <View style={styles.addressContainerRow}>
-                <View style={styles.label}>
-                  <Text style={styles.text}>Country:</Text>
-                </View>
-                <View style={styles.data}>
-                  <Text
-                    style={styles.text}
-                  >{`${item.country}-${item.pinCode}`}</Text>
-                </View>
-              </View>
-              <View style={styles.addressContainerRow}>
-                <View style={styles.label}>
-                  <Text style={styles.text}>Mobile No:</Text>
-                </View>
-                <View style={styles.data}>
-                  <Text style={styles.text}>
-                    {this.state.values.mobileNumber}
-                  </Text>
-                </View>
-              </View>
+              <AddressFlatList
+                userName={`${this.state.values.firstName} ${this.state.values.lastName}`}
+                addressLine1={item.addressLine1}
+                addressLine2={item.addressLine2}
+                city={item.city}
+                state={item.state}
+                country={item.country}
+                pincode={item.pinCode}
+                mobileNumber={this.state.values.mobileNumber}
+              />
+
               <View style={{ marginTop: 10 }}></View>
               <View style={styles.addressContainerRow}>
                 <View style={styles.updateButton}>
@@ -196,6 +156,13 @@ class AddressDetails extends Component<Props, State> {
             </View>
           )}
         />
+        <View style={styles1.container}>
+          <Button
+            title="Add New Address"
+            color="#3F51B5"
+            onPress={() => navigation.navigate("AddAddress")}
+          />
+        </View>
       </View>
     );
   }

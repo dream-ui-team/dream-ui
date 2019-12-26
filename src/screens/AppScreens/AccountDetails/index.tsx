@@ -9,26 +9,18 @@ interface Props {
   navigation: NavigationScreenProp<NavigationState>;
 }
 
-interface MyProfileData {
-  firstName: string;
-  lastName: string;
-  mobileNumber: number;
-  emailAddress: string;
-  userId: string;
-}
-
-class AccountDetails extends Component<Props, { MyProfileData }> {
+class AccountDetails extends Component<Props, { myProfileData }> {
   constructor(props) {
     //
     super(props);
     this.state = {
-      MyProfileData: []
+      myProfileData: []
     };
   }
 
   componentDidMount() {
     AsyncStorage.getItem("userToken").then(value => {
-      this.setState({ MyProfileData: JSON.parse(value) });
+      this.setState({ myProfileData: JSON.parse(value) });
     });
   }
 
@@ -53,7 +45,7 @@ class AccountDetails extends Component<Props, { MyProfileData }> {
           style={styles.ProfileButton}
           onPress={() =>
             navigation.navigate("MyProfileDetails", {
-              values: this.state.MyProfileData
+              values: this.state.myProfileData
             })
           }
         >

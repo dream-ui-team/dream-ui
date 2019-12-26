@@ -19,9 +19,10 @@ import {
 } from "../../../redux/services/user";
 import { Input } from "../../../components";
 import styles from "./styles";
-import { Alert, AsyncStorage } from "react-native";
+import { AsyncStorage } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { colors } from "../../../constants";
+import addressDetails from "./index";
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
@@ -59,11 +60,9 @@ class AddAddress extends Component<Props, State> {
       "details",
       this.state.addresses
     );
-    console.log(this.state.addresses.city);
   }
 
   componentDidMount() {
-    console.log("mounted");
     const { navigation } = this.props;
     AsyncStorage.getItem("userToken")
       .then(value => {
@@ -72,17 +71,11 @@ class AddAddress extends Component<Props, State> {
       .then(res => {
         console.log(this.state.loggedInUser.userId);
       });
-    console.log(this.state.addresses);
+
     if (this.state.addresses.addressLine1 != "") {
       this.setState({ buttonText: "UPDATE" });
     } else {
       this.setState({ buttonText: "Add Address" });
-      // this.state.addresses.addressLine1='';
-      // this.state.addresses.addressLine2='';
-      //  this.state.addresses.country='';
-      //  this.state.addresses.state='';
-      //  this.state.addresses.city='';
-      // this.state.addresses.pinCode='';
     }
   }
 
