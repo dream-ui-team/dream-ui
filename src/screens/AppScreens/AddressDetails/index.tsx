@@ -22,7 +22,14 @@ import AddressFlatList from "./AddressFlatList";
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
-  newAdress: UserAdress;
+}
+
+interface MyProfileData {
+  firstName: string;
+  lastName: string;
+  mobileNumber: number;
+  emailAddress: string;
+  userId: string;
 }
 
 interface UserAdress {
@@ -39,8 +46,9 @@ interface UserAdress {
 interface AddressState {
   page: number;
   limit: number;
-  values: string;
+  values: MyProfileData;
   addresses: UserAdress[];
+  refresh: boolean;
 }
 
 class AddressDetails extends Component<Props, AddressState> {
@@ -48,24 +56,33 @@ class AddressDetails extends Component<Props, AddressState> {
     super(props);
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     this.deleteAddress = this.deleteAddress.bind(this);
-    //this.updateAddress = this.updateAddress.bind(this);
+    this.addNewAddress = this.addNewAddress.bind(this);
     this.state = {
       page: 1,
       limit: 20,
-      values: "",
-      addresses: []
+      values: null,
+      addresses: [],
+      refresh: true
     };
   }
 
-  updateAddresses(address: UserAdress) {
-    console.log("pushing a address");
-    this.state.addresses.push(address);
+  addNewAddress(newAddress: UserAdress) {
+    console.log("adding ..........");
+    if (newAddress != undefined && newAddress != null) {
+      let updatedAddress = this.state.addresses;
+      updatedAddress.push(newAddress);
+      this.setState({
+        addresses: updatedAddress,
+        refresh: !this.state.refresh
+      });
+    } else {
+      console.log("naaa ..........");
+    }
   }
 
   deleteAddress = item => {
     userDeleteAddressService(this.state.values.userId, item.userAddressId)
       .then(res => {
-        //this.setState({ addresses: res });
         console.log("Address Deleted successfully");
         this.componentDidMount();
       })
@@ -120,6 +137,7 @@ class AddressDetails extends Component<Props, AddressState> {
         <View style={styles1.item_separator} />
         <FlatList
           data={this.state.addresses}
+          extraData={this.state.refresh}
           keyExtractor={(x, i) => i.toString()}
           renderItem={({ item }) => (
             <View style={styles.addressContainer}>
@@ -160,7 +178,11 @@ class AddressDetails extends Component<Props, AddressState> {
           <Button
             title="Add New Address"
             color="#3F51B5"
-            onPress={() => navigation.navigate("AddAddress")}
+            onPress={() =>
+              navigation.navigate("AddAddress", {
+                addNewAddress: this.addNewAddress
+              })
+            }
           />
         </View>
       </View>

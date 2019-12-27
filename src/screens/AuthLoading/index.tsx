@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  ActivityIndicator,
-  AsyncStorage,
-  StatusBar,
-  StyleSheet,
-  View
-} from "react-native";
+import { ActivityIndicator, AsyncStorage, View } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 
 interface Props {

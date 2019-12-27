@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Formik } from "formik";
-import * as Yup from "yup";
 import {
   userAddAddressService,
   userUpdateAddressService,
@@ -19,22 +18,23 @@ import {
 } from "../../../redux/services/user";
 import { Input } from "../../../components";
 import styles from "./styles";
-import { AsyncStorage } from "react-native";
+import { Alert, AsyncStorage } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { colors } from "../../../constants";
-import addressDetails from "./index";
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
 }
 
-interface addressData {
+interface UserAdress {
+  userAddressId: string;
   addressLine1: string;
   addressLine2: string;
-  country: string;
   state: string;
   city: string;
-  pinCode: string;
+  country: string;
+  pincode: string;
+  mobileNumber: string;
 }
 
 class AddAddress extends Component<Props, State> {
@@ -63,7 +63,6 @@ class AddAddress extends Component<Props, State> {
   }
 
   componentDidMount() {
-    const { navigation } = this.props;
     AsyncStorage.getItem("userToken")
       .then(value => {
         this.setState({ loggedInUser: JSON.parse(value) });
@@ -79,7 +78,7 @@ class AddAddress extends Component<Props, State> {
     }
   }
 
-  handleAddressChange = (values: addressData) => {
+  handleAddressChange = (values: UserAdress) => {
     const { navigation } = this.props;
     if (this.state.buttonText == "Add Address") {
       console.log("in add address");
@@ -89,17 +88,24 @@ class AddAddress extends Component<Props, State> {
         values.country,
         values.state,
         values.city,
-        values.pinCode,
+        values.pincode,
         this.state.loggedInUser.userId
       ).then(res => {
         if (res["errorCode"] == undefined || res["errorCode"] == "") {
           console.log("address added successfully");
+          values.userAddressId = res["userAddressId"];
+          const addAddressFunction = this.props.navigation.getParam(
+            "addNewAddress",
+            ""
+          );
+          addAddressFunction(values);
+          this.state.values = null;
+          Alert.alert("Address added Successfully");
           navigation.navigate("AddressDetails");
         }
       });
     } else {
       console.log("in update address");
-      console.log(values.pinCode);
       userUpdateAddressService(
         this.state.addresses.userAddressId,
         values.addressLine1,
@@ -107,7 +113,7 @@ class AddAddress extends Component<Props, State> {
         values.country,
         values.state,
         values.city,
-        values.pinCode,
+        values.pincode,
         this.state.loggedInUser.userId
       ).then(res => {
         if (res["errorCode"] == undefined || res["errorCode"] == "") {
@@ -117,19 +123,21 @@ class AddAddress extends Component<Props, State> {
       });
     }
   };
+
   handleLogout = () => {
     const { navigation } = this.props;
     logoutUserService().then(() => {
       navigation.navigate("AuthStack");
     });
   };
+
   handleBackButtonClick() {
     const { navigation } = this.props;
     navigation.navigate("AddressDetails");
     return true;
   }
+
   render() {
-    const { navigation } = this.props;
     return (
       <View style={styles.container}>
         <KeyboardAvoidingView
@@ -145,7 +153,6 @@ class AddAddress extends Component<Props, State> {
                 city: `${this.state.addresses.city}`,
                 pinCode: `${this.state.addresses.pinCode}`
               }}
-              //validationSchema={loginSchema}
               onSubmit={values => this.handleAddressChange(values)}
             >
               {props => {
