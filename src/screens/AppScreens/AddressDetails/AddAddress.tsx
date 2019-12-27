@@ -34,7 +34,6 @@ interface UserAdress {
   city: string;
   country: string;
   pincode: string;
-  mobileNumber: string;
 }
 
 class AddAddress extends Component<Props, State> {
@@ -43,23 +42,9 @@ class AddAddress extends Component<Props, State> {
     this.state = {
       page: 1,
       limit: 20,
-      loggedInUser: "",
-      addresses: {
-        userAddressId: "",
-        addressLine1: "",
-        addressLine2: "",
-        country: "",
-        state: "",
-        city: "",
-        pinCode: ""
-      },
-      buttonText: ""
+      loggedInUser: ""
     };
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
-    this.state.addresses = this.props.navigation.getParam(
-      "details",
-      this.state.addresses
-    );
   }
 
   componentDidMount() {
@@ -70,18 +55,11 @@ class AddAddress extends Component<Props, State> {
       .then(res => {
         console.log(this.state.loggedInUser.userId);
       });
-
-    if (this.state.addresses.addressLine1 != "") {
-      this.setState({ buttonText: "UPDATE" });
-    } else {
-      this.setState({ buttonText: "Add Address" });
-    }
   }
 
   handleAddressChange = (values: UserAdress) => {
     const { navigation } = this.props;
-    if (this.state.buttonText == "Add Address") {
-      console.log("in add address");
+    if (this.props.navigation.getParam("buttonText", "") == "Add Address") {
       userAddAddressService(
         values.addressLine1,
         values.addressLine2,
@@ -99,15 +77,15 @@ class AddAddress extends Component<Props, State> {
             ""
           );
           addAddressFunction(values);
-          this.state.values = null;
           Alert.alert("Address added Successfully");
           navigation.navigate("AddressDetails");
+        } else {
+          Alert.alert("Failed to add a address");
         }
       });
     } else {
-      console.log("in update address");
       userUpdateAddressService(
-        this.state.addresses.userAddressId,
+        values.userAddressId,
         values.addressLine1,
         values.addressLine2,
         values.country,
@@ -118,7 +96,15 @@ class AddAddress extends Component<Props, State> {
       ).then(res => {
         if (res["errorCode"] == undefined || res["errorCode"] == "") {
           console.log("address updated successfully");
+          const updateAddressFunction = this.props.navigation.getParam(
+            "updateAddress",
+            ""
+          );
+          updateAddressFunction(values);
+          Alert.alert("Address updated successfully");
           navigation.navigate("AddressDetails");
+        } else {
+          Alert.alert("Failed to update a address");
         }
       });
     }
@@ -145,13 +131,24 @@ class AddAddress extends Component<Props, State> {
         >
           <ScrollView bounces={false}>
             <Formik
+              enableReinitialize
               initialValues={{
-                addressLine1: `${this.state.addresses.addressLine1}`,
-                addressLine2: `${this.state.addresses.addressLine2}`,
-                country: `${this.state.addresses.country}`,
-                state: `${this.state.addresses.state}`,
-                city: `${this.state.addresses.city}`,
-                pinCode: `${this.state.addresses.pinCode}`
+                addressLine1: this.props.navigation.getParam(
+                  "addressLine1",
+                  ""
+                ),
+                addressLine2: this.props.navigation.getParam(
+                  "addressLine2",
+                  ""
+                ),
+                country: this.props.navigation.getParam("country", ""),
+                state: this.props.navigation.getParam("state", ""),
+                city: this.props.navigation.getParam("city", ""),
+                pincode: this.props.navigation.getParam("pincode", ""),
+                userAddressId: this.props.navigation.getParam(
+                  "userAddressId",
+                  ""
+                )
               }}
               onSubmit={values => this.handleAddressChange(values)}
             >
@@ -170,16 +167,16 @@ class AddAddress extends Component<Props, State> {
                       <View style={styles1.midContainer}>
                         <Text
                           style={styles1.headerTitle}
-                        >{`ProfileDetails`}</Text>
+                        >{`Address details`}</Text>
                       </View>
                     </View>
+
                     <View style={styles.inputContainer}>
                       <Text>Address Line1:</Text>
                       <Input
                         placeholder="AddressLine1"
                         value={props.values.addressLine1}
                         onChangeText={props.handleChange("addressLine1")}
-                        //onBlur={props.handleBlur("firstName")}
                         error={
                           props.touched.addressLine1 &&
                           props.errors.addressLine1
@@ -190,49 +187,47 @@ class AddAddress extends Component<Props, State> {
                         placeholder="AddressLine2"
                         value={props.values.addressLine2}
                         onChangeText={props.handleChange("addressLine2")}
-                        //onBlur={props.handleBlur("lastName")}
                         error={
                           props.touched.addressLine2 &&
                           props.errors.addressLine2
                         }
-                      />
-                      <Text>Country:</Text>
-                      <Input
-                        placeholder="Country"
-                        value={props.values.country}
-                        onChangeText={props.handleChange("country")}
-                        //onBlur={props.handleBlur("email")}
-                        error={props.touched.country && props.errors.country}
-                      />
-                      <Text>State:</Text>
-                      <Input
-                        placeholder="State"
-                        value={props.values.state}
-                        onChangeText={props.handleChange("state")}
-                        //onBlur={props.handleBlur("mobileNum")}
-                        error={props.touched.state && props.errors.state}
                       />
                       <Text>City:</Text>
                       <Input
                         placeholder="City"
                         value={props.values.city}
                         onChangeText={props.handleChange("city")}
-                        //onBlur={props.handleBlur("city")}
-
                         error={props.touched.city && props.errors.city}
+                      />
+
+                      <Text>State:</Text>
+                      <Input
+                        placeholder="State"
+                        value={props.values.state}
+                        onChangeText={props.handleChange("state")}
+                        error={props.touched.state && props.errors.state}
+                      />
+
+                      <Text>Country:</Text>
+                      <Input
+                        placeholder="Country"
+                        value={props.values.country}
+                        onChangeText={props.handleChange("country")}
+                        error={props.touched.country && props.errors.country}
                       />
                       <Text>Pincode:</Text>
                       <Input
                         placeholder="Pincode"
-                        value={props.values.pinCode}
-                        onChangeText={props.handleChange("pinCode")}
-                        //onBlur={props.handleBlur("city")}
-
-                        error={props.touched.pinCode && props.errors.pinCode}
+                        value={props.values.pincode}
+                        onChangeText={props.handleChange("pincode")}
+                        error={props.touched.pincode && props.errors.pincode}
                       />
                       <View style={styles1.ButtonContainer}>
                         <Button
-                          title={this.state.buttonText}
+                          title={this.props.navigation.getParam(
+                            "buttonText",
+                            ""
+                          )}
                           color="#3F51B5"
                           onPress={props.handleSubmit}
                         />

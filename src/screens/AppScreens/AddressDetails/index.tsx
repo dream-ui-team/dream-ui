@@ -6,7 +6,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Button
+  Button,
+  Alert
 } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import styles from "./styles";
@@ -32,7 +33,7 @@ interface MyProfileData {
   userId: string;
 }
 
-interface UserAdress {
+interface UserAddress {
   userAddressId: string;
   addressLine1: string;
   addressLine2: string;
@@ -47,7 +48,7 @@ interface AddressState {
   page: number;
   limit: number;
   values: MyProfileData;
-  addresses: UserAdress[];
+  addresses: UserAddress[];
   refresh: boolean;
 }
 
@@ -57,6 +58,7 @@ class AddressDetails extends Component<Props, AddressState> {
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     this.deleteAddress = this.deleteAddress.bind(this);
     this.addNewAddress = this.addNewAddress.bind(this);
+    this.updateAddress = this.updateAddress.bind(this);
     this.state = {
       page: 1,
       limit: 20,
@@ -66,13 +68,12 @@ class AddressDetails extends Component<Props, AddressState> {
     };
   }
 
-  addNewAddress(newAddress: UserAdress) {
-    console.log("adding ..........");
+  addNewAddress(newAddress: UserAddress) {
     if (newAddress != undefined && newAddress != null) {
-      let updatedAddress = this.state.addresses;
-      updatedAddress.push(newAddress);
+      let updatedAddresses = this.state.addresses;
+      updatedAddresses.push(newAddress);
       this.setState({
-        addresses: updatedAddress,
+        addresses: updatedAddresses,
         refresh: !this.state.refresh
       });
     } else {
@@ -80,11 +81,35 @@ class AddressDetails extends Component<Props, AddressState> {
     }
   }
 
+  updateAddress(updatedAddress: UserAddress) {
+    if (updatedAddress != undefined && updatedAddress != null) {
+      let filteredAddresses = this.state.addresses.filter(
+        address => address.userAddressId != updatedAddress.userAddressId
+      );
+      filteredAddresses.push(updatedAddress);
+      this.setState({
+        addresses: filteredAddresses,
+        refresh: !this.state.refresh
+      });
+    } else {
+      console.log("error: no address found to update");
+    }
+  }
+
   deleteAddress = item => {
     userDeleteAddressService(this.state.values.userId, item.userAddressId)
       .then(res => {
-        console.log("Address Deleted successfully");
-        this.componentDidMount();
+        if (res["errorCode"] == undefined || res["errorCode"] == "") {
+          let filteredAddresses = this.state.addresses.filter(
+            address => address.userAddressId != item.userAddressId
+          );
+          this.setState({
+            addresses: filteredAddresses,
+            refresh: !this.state.refresh
+          });
+        } else {
+          Alert.alert("failed to delete the address");
+        }
       })
       .catch(console.log);
   };
@@ -148,7 +173,7 @@ class AddressDetails extends Component<Props, AddressState> {
                 city={item.city}
                 state={item.state}
                 country={item.country}
-                pincode={item.pinCode}
+                pincode={item.pincode}
                 mobileNumber={this.state.values.mobileNumber}
               />
 
@@ -159,7 +184,15 @@ class AddressDetails extends Component<Props, AddressState> {
                     text="Update"
                     onPress={() =>
                       this.props.navigation.navigate("AddAddress", {
-                        details: item
+                        addressLine1: item.addressLine1,
+                        addressLine2: item.addressLine2,
+                        city: item.city,
+                        state: item.state,
+                        country: item.country,
+                        pincode: item.pincode,
+                        buttonText: "Update address",
+                        userAddressId: item.userAddressId,
+                        updateAddress: this.updateAddress
                       })
                     }
                   />
@@ -180,7 +213,8 @@ class AddressDetails extends Component<Props, AddressState> {
             color="#3F51B5"
             onPress={() =>
               navigation.navigate("AddAddress", {
-                addNewAddress: this.addNewAddress
+                addNewAddress: this.addNewAddress,
+                buttonText: "Add Address"
               })
             }
           />

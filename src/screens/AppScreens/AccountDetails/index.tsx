@@ -11,7 +11,6 @@ interface Props {
 
 class AccountDetails extends Component<Props, { myProfileData }> {
   constructor(props) {
-    //
     super(props);
     this.state = {
       myProfileData: []
