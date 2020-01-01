@@ -150,7 +150,10 @@ class AddAddress extends Component<Props, State> {
                   ""
                 )
               }}
-              onSubmit={values => this.handleAddressChange(values)}
+              onSubmit={(values, { resetForm }) => {
+                this.handleAddressChange(values);
+                resetForm();
+              }}
             >
               {props => {
                 return (

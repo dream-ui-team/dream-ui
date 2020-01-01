@@ -17,7 +17,7 @@ import AccountDetails from "../screens/AppScreens/AccountDetails";
 import MyProfileDetails from "../screens/AppScreens/MyProfileDetails";
 import AddAddress from "../screens/AppScreens/AddressDetails/AddAddress";
 import ServiceCenterDetails from "../screens/AppScreens/Home/ServiceCenterDetails";
-import OrderRequest from "../screens/AppScreens/Home/OrderRequest";
+import OrderRequest from "../screens/AppScreens/Orders/OrderRequest";
 
 const { width } = Dimensions.get("window");
 

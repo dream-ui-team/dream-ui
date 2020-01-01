@@ -4,18 +4,19 @@ import { Alert } from "react-native";
 import base64 from "react-native-base64";
 
 export function fetchImageService(page?: number, limit?: number) {
-  return new Promise((resolve, reject) => {
-    fetch(`https://picsum.photos/v2/list?page=${page}&limit=${limit}`)
-      .then(res => {
-        return res.json();
-      })
-      .then(response => {
-        resolve(response);
-      })
-      .catch(error => {
-        reject(error);
-      });
-  });
+  // return new Promise((resolve, reject) => {
+  //   fetch(`https://picsum.photos/v2/list?page=${page}&limit=${limit}`)
+  //     .then(res => {
+  //       return res.json();
+  //     })
+  //     .then(response => {
+  //       resolve(response);
+  //     })
+  //     .catch(error => {
+  //       reject(error);
+  //     });
+  // });
+  return [];
 }
 
 /**
@@ -24,22 +25,25 @@ export function fetchImageService(page?: number, limit?: number) {
  * a new access token.
  */
 const getOauthAccessToken = async () => {
+  //checking if we already have oauth token
   const currentToken = await AsyncStorage.getItem("accessToken");
   const expiryTime = await AsyncStorage.getItem("accessTokenExpiryTime");
 
+  // checking if existing token is valid or expired
   if (currentToken != undefined && currentToken != "") {
     const isValid = new Date(expiryTime) > new Date();
-    console.log("is this token valid:" + isValid);
     if (isValid) {
       return currentToken;
     }
   }
+
+  // either token is expired or does not exist
+  // Setting up required headers
   var headers = new Headers();
   headers.append(
     "Authorization",
     "Basic " + base64.encode(`${urls.clientId}:${urls.clientSecret}`)
   );
-
   headers.append("Access-Control-Allow-Origin", "*");
   headers.append(
     "Access-Control-Allow-Methods",
@@ -56,24 +60,20 @@ const getOauthAccessToken = async () => {
   formdata.append("password", "tester");
   formdata.append("grant_type", "password");
 
-  console.log("fetching the token");
+  // Fetching token
   const tokenResponse = await fetch(`${urls.Base}/oauth/token`, {
     method: "POST",
     headers: headers,
     body: formdata
   });
-  console.log("response received:");
   const responseJson = await tokenResponse.json();
 
+  // putting token in async storage
   AsyncStorage.setItem("accessToken", responseJson["access_token"]);
+
+  // putting token expiration time in async storage
   let tokenExpireIn = responseJson["expires_in"];
   let tokenExpiryTime = new Date();
-  console.log(
-    "this token will expire in  " +
-      tokenExpireIn +
-      " seconds and current time is " +
-      tokenExpiryTime
-  );
   // if there is not expiration time, keeping default expiration time as one month
   if (tokenExpireIn != undefined && currentToken != "") {
     tokenExpiryTime.setSeconds(tokenExpiryTime.getSeconds() + tokenExpireIn);
@@ -82,6 +82,7 @@ const getOauthAccessToken = async () => {
   }
   // this will be used to check if token is expired
   AsyncStorage.setItem("accessTokenExpiryTime", tokenExpiryTime.toString());
+
   return responseJson["access_token"];
 };
 
@@ -112,6 +113,25 @@ export async function loginUserService(username: string, password: string) {
     .catch(error => {
       Alert.alert(error);
     });
+}
+
+export async function getAllUserVehicles(userId: string) {
+  let userVehicles = await AsyncStorage.getItem("userVehicles");
+  if (userVehicles == undefined) {
+    const token = await getOauthAccessToken();
+    const response = await fetch(`${urls.Base}/users/${userId}/vehicles`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+    const responseJson = await response.json();
+    userVehicles = JSON.stringify(responseJson);
+    AsyncStorage.setItem("userVehicles", userVehicles);
+  }
+  return userVehicles;
 }
 
 export async function userRegistrationService(
@@ -410,6 +430,7 @@ export function logoutUserService() {
   return new Promise((resolve, reject) => {
     AsyncStorage.removeItem("accessToken");
     AsyncStorage.removeItem("accessTokenExpiryTime");
+    AsyncStorage.removeItem("userVehicles");
     AsyncStorage.removeItem("userToken")
       .then(() => {
         resolve();

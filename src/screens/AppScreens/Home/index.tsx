@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { View, FlatList, Picker, Text, TouchableOpacity } from "react-native";
+import {
+  AsyncStorage,
+  View,
+  FlatList,
+  Picker,
+  Text,
+  TouchableOpacity
+} from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Header } from "../../../components";
 import styles from "./styles";
@@ -32,6 +39,7 @@ interface HomeState {
   places: Place[];
   selectedPlaceId: string;
   searchTerm: string;
+  userId: string;
 }
 
 interface Place {
@@ -48,13 +56,18 @@ class Home extends Component<Props, HomeState> {
       partners: [],
       places: [],
       selectedPlaceId: "",
-      searchTerm: ""
+      searchTerm: "",
+      userId: ""
     }),
-      getAllLocationsService()
-        .then(res => {
-          this.setState({ places: res });
-        })
-        .catch(console.log);
+      AsyncStorage.getItem("userToken").then(value => {
+        const userValues = JSON.parse(value);
+        this.state.userId = userValues.userId;
+      });
+    getAllLocationsService()
+      .then(res => {
+        this.setState({ places: res });
+      })
+      .catch(console.log);
   }
 
   searchUpdated(term) {
@@ -104,6 +117,10 @@ class Home extends Component<Props, HomeState> {
 
     return (
       <View style={styles.container}>
+        {/* We should add one more picker here to select the type of service
+          user wants to use. e.g servicing, washing, repair.
+          Then we should fetch service centers based on locationId and service type
+          */}
         <Header
           title="Home"
           leftButtonPress={() => navigation.openDrawer()}
@@ -165,7 +182,10 @@ class Home extends Component<Props, HomeState> {
                     <TouchableOpacity
                       style={styles.buttonStyle}
                       onPress={() =>
-                        navigation.navigate("OrderRequest", { details: item })
+                        navigation.navigate("OrderRequest", {
+                          serviceCenter: item,
+                          userId: this.state.userId
+                        })
                       }
                     >
                       <Text style={styles.buttonTextStyle}>
@@ -181,12 +201,14 @@ class Home extends Component<Props, HomeState> {
           <Text
             style={{
               marginTop: 200,
-              marginLeft: 150,
               alignItems: "center",
-              justifyContent: "center"
+              justifyContent: "center",
+              textAlign: "center", // <-- the magic
+              fontWeight: "bold",
+              fontSize: 18
             }}
           >
-            {"No Data"}
+            {"Please select a location from above drop down"}
           </Text>
         )}
       </View>

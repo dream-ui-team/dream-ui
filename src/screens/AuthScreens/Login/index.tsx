@@ -34,7 +34,6 @@ const loginSchema = Yup.object().shape({
 class Login extends Component<Props, {}> {
   isValidCredentials = function() {
     let isValid = AsyncStorage.getItem("userToken");
-    console.log("****" + isValid);
     return isValid != undefined;
   };
 
@@ -53,7 +52,6 @@ class Login extends Component<Props, {}> {
   };
 
   render() {
-    //  const { navigation } = this.props;
     return (
       <View style={styles.container}>
         <KeyboardAvoidingView behavior="padding">

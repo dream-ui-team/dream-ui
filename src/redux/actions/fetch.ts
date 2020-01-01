@@ -6,31 +6,31 @@ export const DATA_LOADING = "DATA_LOADING";
 export const FETCH_MORE = "FETCH_MORE";
 
 export function fetchImageData(page?: number, limit?: number) {
-  return (dispatch: Dispatch) => {
-    dispatch(loading(true));
-    fetchImageService(page, limit)
-      .then((res: any) => {
-        dispatch(imageDataFetched(res));
-        dispatch(loading(false));
-      })
-      .catch(err => {
-        dispatch(loading(false));
-      });
-  };
+  //return (dispatch: Dispatch) => {
+  //dispatch(loading(true));
+  // fetchImageService(page, limit)
+  //   .then((res: any) => {
+  //     dispatch(imageDataFetched(res));
+  //     dispatch(loading(false));
+  //   })
+  //   .catch(err => {
+  //     dispatch(loading(false));
+  //   });
+  //  };
 }
 
 export function fetchMoreImageData(page?: number, limit?: number) {
-  return (dispatch: Dispatch) => {
-    dispatch(loading(true));
-    fetchImageService(page, limit)
-      .then((res: any) => {
-        dispatch(fetchMore(res));
-        dispatch(loading(false));
-      })
-      .catch(err => {
-        dispatch(loading(false));
-      });
-  };
+  //return (dispatch: Dispatch) => {
+  //dispatch(loading(true));
+  // fetchImageService(page, limit)
+  //   .then((res: any) => {
+  //     dispatch(fetchMore(res));
+  //     dispatch(loading(false));
+  //   })
+  //   .catch(err => {
+  //     dispatch(loading(false));
+  //   });
+  //  };
 }
 
 const imageDataFetched = (data: any[]) => ({
