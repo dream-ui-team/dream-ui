@@ -11,7 +11,8 @@ import { NavigationScreenProp, NavigationState } from "react-navigation";
 
 import {
   logoutUserService,
-  getAllUserVehicles
+  getAllUserVehicles,
+  getPickupAndDropLocations
 } from "../../../redux/services/user";
 import { colors } from "../../../constants";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -72,6 +73,7 @@ class OrderRequest extends Component<Props, OrderState> {
     getAllUserVehicles(userId).then(res => {
       this.setState({ vehicles: JSON.parse(res), userId: userId });
     });
+    this.findPickupAndDropLocations(navigation.getParam("locationId", ""));
   }
 
   handleLogout = () => {
@@ -87,6 +89,12 @@ class OrderRequest extends Component<Props, OrderState> {
     return true;
   }
 
+  findPickupAndDropLocations(locationId: string) {
+    getPickupAndDropLocations(locationId).then(res => {
+      this.setState({ pickOrDropLocations: res });
+    });
+  }
+
   render() {
     const { navigation } = this.props;
     let serviceCenter = navigation.getParam("serviceCenter", "");
@@ -99,6 +107,7 @@ class OrderRequest extends Component<Props, OrderState> {
     vehicles.push(
       <Picker.Item key={"NULL"} label={"Select your vehicle"} value={"null"} />
     );
+
     /* Pushing all user vehicles*/
     const userVehicles = this.state.vehicles;
     for (var i = 0; i < userVehicles.length; i++) {
@@ -134,7 +143,7 @@ class OrderRequest extends Component<Props, OrderState> {
         <Picker.Item
           key={locations[i].pickAndDropId}
           label={locationName}
-          value={userVehicles[i].vehicleId}
+          value={locations[i].pickAndDropId}
         />
       );
     }
@@ -148,7 +157,7 @@ class OrderRequest extends Component<Props, OrderState> {
                --> 2.2 fetch from back end
                --> 2.3 if not found, redirect user to add vehicle page
           3. show services provided by partner and then allow user to select a service
-             --> *** this should be done in home only
+             --> *** this should be done in home page only
           4.
              (** are we allowing user to desire pick up and drop locations or fixed set of pick up and drop
              location for first release?? )
@@ -156,6 +165,7 @@ class OrderRequest extends Component<Props, OrderState> {
               --> 4.1 check async storage
               --> 4.2 fetch from back end
               --> 4.3 if not found, redirect user to add address page
+         5. pick-up time
           */}
         <View style={styles.orderRequestContainer}>
           <View style={styles.leftContainer}>
@@ -210,6 +220,8 @@ class OrderRequest extends Component<Props, OrderState> {
             {pickOrDropLocations}
           </Picker>
         </View>
+        <View style={{ marginTop: 10 }}></View>
+
         <View style={{ marginTop: 10 }}></View>
         <View>
           {/* fetch and display drop location */}

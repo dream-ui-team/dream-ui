@@ -184,7 +184,8 @@ class Home extends Component<Props, HomeState> {
                       onPress={() =>
                         navigation.navigate("OrderRequest", {
                           serviceCenter: item,
-                          userId: this.state.userId
+                          userId: this.state.userId,
+                          locationId: this.state.selectedPlaceId
                         })
                       }
                     >

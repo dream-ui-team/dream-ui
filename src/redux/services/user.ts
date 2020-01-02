@@ -190,7 +190,29 @@ export async function getUserAddressService(userId: String) {
     });
 }
 
-export async function getUserVehicles(userId: String) {
+export async function getPickupAndDropLocations(locationId: string) {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/locations/${locationId}/PickAndDropLocations`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  })
+    .then(res => res.json())
+    .then(response => {
+      console.log(
+        "Successfully retrieved pick and drop locations: " + response
+      );
+      return response;
+    })
+    .catch(error => {
+      console.log("failed to get pick and drop locations " + error);
+    });
+}
+
+export async function getUserVehicles(userId: string) {
   const token = await getOauthAccessToken();
   return fetch(`${urls.Base}/users/vehicles?userId=${userId}`, {
     method: "POST",
