@@ -229,15 +229,17 @@ class Home extends Component<Props, HomeState> {
         ) : (
           <Text
             style={{
-              marginTop: 200,
+              marginTop: 190,
+              marginLeft: 10,
+              marginRight: 10,
               alignItems: "center",
               justifyContent: "center",
-              textAlign: "center", // <-- the magic
+              textAlign: "center",
               fontWeight: "bold",
               fontSize: 18
             }}
           >
-            {"Please select a location from above drop down"}
+            {"Select your location from above drop down"}
           </Text>
         )}
       </View>

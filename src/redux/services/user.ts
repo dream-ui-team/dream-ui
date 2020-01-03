@@ -169,6 +169,27 @@ export async function userRegistrationService(
     });
 }
 
+export async function getPartnerPaymentMode(partnerId: String) {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/partners/${partnerId}/paymentmodes`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  })
+    .then(res => res.json())
+    .then(response => {
+      console.log("Successfully retrieved payment modes for given partner");
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+      console.log("Failed to retrieved payment modes " + error);
+    });
+}
+
 export async function getUserAddressService(userId: String) {
   const token = await getOauthAccessToken();
   return fetch(`${urls.Base}/users/${userId}/addresses`, {
@@ -202,9 +223,7 @@ export async function getPickupAndDropLocations(locationId: string) {
   })
     .then(res => res.json())
     .then(response => {
-      console.log(
-        "Successfully retrieved pick and drop locations: " + response
-      );
+      console.log("Successfully retrieved pick and drop locations");
       return response;
     })
     .catch(error => {
@@ -414,7 +433,7 @@ export async function getServiceCentresByLocationId(locationId: string) {
   })
     .then(res => res.json())
     .then(response => {
-      console.log("fatch parnters for given location");
+      console.log("fetched parnters for given location");
       return response;
     })
     .catch(error => {

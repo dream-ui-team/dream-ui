@@ -5,17 +5,25 @@ import {
   Text,
   TouchableOpacity,
   Picker,
-  Button
+  Button,
+  Platform,
+  Alert,
+  ScrollView
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
-
 import {
   logoutUserService,
   getAllUserVehicles,
-  getPickupAndDropLocations
+  getPickupAndDropLocations,
+  getPartnerPaymentMode
 } from "../../../redux/services/user";
 import { colors } from "../../../constants";
 import Icon from "react-native-vector-icons/MaterialIcons";
+
+interface Props {
+  navigation: NavigationScreenProp<NavigationState>;
+}
 
 interface ParterDetails {
   partnerId: string;
@@ -24,10 +32,6 @@ interface ParterDetails {
   alternateMobileNumber: number;
   address: string;
   mobileNumber: number;
-}
-
-interface Props {
-  navigation: NavigationScreenProp<NavigationState>;
 }
 
 interface UserVehicle {
@@ -44,13 +48,23 @@ interface PickOrDropLocation {
   dropLocationName: string;
 }
 
+interface PaymentMode {
+  id: string;
+  paymentMode: string;
+  details: string;
+}
+
 interface OrderState {
   vehicles: UserVehicle[];
   pickOrDropLocations: PickOrDropLocation[];
+  paymentModes: PaymentMode[];
   userId: String;
   selectedVehicleId: string;
   selectedPickupLocationId: string;
   selectedDropLocationId: string;
+  selectedPaymentModeId: string;
+  vehiclePickupTime: Date;
+  showVehiclePickupTimer: boolean;
 }
 
 class OrderRequest extends Component<Props, OrderState> {
@@ -60,20 +74,34 @@ class OrderRequest extends Component<Props, OrderState> {
     this.state = {
       vehicles: [],
       pickOrDropLocations: [],
+      paymentModes: [],
       userId: "",
       selectedVehicleId: "",
       selectedPickupLocationId: "",
-      selectedDropLocationId: ""
+      selectedDropLocationId: "",
+      selectedPaymentModeId: "",
+      vehiclePickupTime: new Date(),
+      showVehiclePickupTimer: false
     };
   }
 
   componentDidMount() {
     const { navigation } = this.props;
+
     const userId = navigation.getParam("userId", "");
     getAllUserVehicles(userId).then(res => {
       this.setState({ vehicles: JSON.parse(res), userId: userId });
     });
-    this.findPickupAndDropLocations(navigation.getParam("locationId", ""));
+
+    const locationId = navigation.getParam("locationId", "");
+    getPickupAndDropLocations(locationId).then(res => {
+      this.setState({ pickOrDropLocations: res });
+    });
+
+    const serviceCenter = navigation.getParam("serviceCenter", "");
+    getPartnerPaymentMode(serviceCenter.partnerId).then(paymentModes => {
+      this.setState({ paymentModes: paymentModes });
+    });
   }
 
   handleLogout = () => {
@@ -85,15 +113,17 @@ class OrderRequest extends Component<Props, OrderState> {
 
   handleBackButtonClick() {
     const { navigation } = this.props;
-    navigation.navigate("MainStack");
+    navigation.navigate("Home");
     return true;
   }
 
-  findPickupAndDropLocations(locationId: string) {
-    getPickupAndDropLocations(locationId).then(res => {
-      this.setState({ pickOrDropLocations: res });
+  setVehiclePickupTimer = (event, date) => {
+    date = date || this.state.vehiclePickupTime;
+    this.setState({
+      showVehiclePickupTimer: Platform.OS === "ios" ? true : false,
+      vehiclePickupTime: date
     });
-  }
+  };
 
   render() {
     const { navigation } = this.props;
@@ -148,9 +178,47 @@ class OrderRequest extends Component<Props, OrderState> {
       );
     }
 
+    let paymentModes = [];
+    /* Pushing first value*/
+    paymentModes.push(
+      <Picker.Item
+        key={"NULL"}
+        label={"Select a payment mode"}
+        value={"null"}
+      />
+    );
+    const partnerPaymentModes = this.state.paymentModes;
+    for (var i = 0; i < partnerPaymentModes.length; i++) {
+      paymentModes.push(
+        <Picker.Item
+          key={partnerPaymentModes[i].id}
+          label={partnerPaymentModes[i].paymentMode}
+          value={partnerPaymentModes[i].id}
+        />
+      );
+    }
+
     return (
       <View style={styles.container}>
-        {/*
+        <View style={styles.orderRequestContainer}>
+          {/* back button*/}
+          <View style={styles.leftContainer}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={this.handleBackButtonClick}
+            >
+              <Icon name="arrow-back" size={24} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Header title*/}
+          <View style={styles.midContainer}>
+            <Text style={styles.headerTitle}>{`Service Request`}</Text>
+          </View>
+        </View>
+        <ScrollView>
+          <View style={styles.container}>
+            {/*
           1. Display Service center name
           2. fetch and allow to pick vehicle to be serviced
                --> 2.1 check async storage
@@ -166,90 +234,141 @@ class OrderRequest extends Component<Props, OrderState> {
               --> 4.2 fetch from back end
               --> 4.3 if not found, redirect user to add address page
          5. pick-up time
+         6. payment modes
           */}
-        <View style={styles.orderRequestContainer}>
-          <View style={styles.leftContainer}>
-            <TouchableOpacity
-              style={styles.iconButton}
-              onPress={this.handleBackButtonClick}
-            >
-              <Icon name="arrow-back" size={24} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.midContainer}>
-            <Text style={styles.headerTitle}>{`Service Request`}</Text>
-          </View>
-        </View>
-        <View style={{ marginTop: 10 }}></View>
-        <View>
-          {/* make service center name distinguishable*/}
-          <Text style={styles.page_text}>
-            Service center: {serviceCenter.name}
-          </Text>
-        </View>
-        <View style={{ marginTop: 10 }}></View>
-        <View>
-          <Text style={styles.page_text}>Select vehicle to service:</Text>
-        </View>
-        <View style={styles.pickerContainer}>
-          <Picker
-            style={styles.pickerStyle}
-            selectedValue={this.state.selectedVehicleId}
-            onValueChange={(vehicleId, index) => {
-              this.setState({ selectedVehicleId: vehicleId });
-            }}
-          >
-            {vehicles}
-          </Picker>
-        </View>
-        <View style={{ marginTop: 10 }}></View>
-        <View>
-          {/* fetch and display pick up location */}
-          <Text style={styles.page_text}>
-            Select location to pick your vehicle from:
-          </Text>
-        </View>
-        <View style={styles.pickerContainer}>
-          <Picker
-            style={styles.pickerStyle}
-            selectedValue={this.state.selectedPickupLocationId}
-            onValueChange={(locationId, index) => {
-              this.setState({ selectedPickupLocationId: locationId });
-            }}
-          >
-            {pickOrDropLocations}
-          </Picker>
-        </View>
-        <View style={{ marginTop: 10 }}></View>
 
-        <View style={{ marginTop: 10 }}></View>
-        <View>
-          {/* fetch and display drop location */}
-          <Text style={styles.page_text}>
-            Select location to drop your vehicle to:
-          </Text>
-        </View>
-        <View style={styles.pickerContainer}>
-          <Picker
-            style={styles.pickerStyle}
-            selectedValue={this.state.selectedDropLocationId}
-            onValueChange={(locationId, index) => {
-              this.setState({ selectedDropLocationId: locationId });
-            }}
-          >
-            {pickOrDropLocations}
-          </Picker>
-        </View>
-        <View>
-          {/* order placement button */}
-          <Button
-            title="Place service request"
-            onPress={() => {
-              console.log("Implement final order call");
-              console.log("Selected vehicle:" + this.state.selectedVehicleId);
-            }}
-          />
-        </View>
+            <View style={{ marginTop: 10 }}></View>
+
+            {/* Service center details*/}
+            <View>
+              {/* make service center name distinguishable*/}
+              <Text style={styles.page_text}>
+                Service center: {serviceCenter.name}
+              </Text>
+            </View>
+            <View style={{ marginTop: 10 }}></View>
+
+            {/* User vehicles drop down*/}
+            <View>
+              <Text style={styles.page_text}>Choose your vehicle:</Text>
+            </View>
+            <View style={styles.pickerContainer}>
+              <Picker
+                style={styles.pickerStyle}
+                selectedValue={this.state.selectedVehicleId}
+                onValueChange={(vehicleId, index) => {
+                  this.setState({ selectedVehicleId: vehicleId });
+                }}
+              >
+                {vehicles}
+              </Picker>
+            </View>
+            <View>
+              <Text style={{ textAlign: "center", fontSize: 18 }}>OR</Text>
+            </View>
+            <View style={styles.addVehicleButton}>
+              <TouchableOpacity
+                onPress={() => {
+                  Alert.alert(
+                    "Implement me : I should able to add a new vehicle"
+                  );
+                }}
+              >
+                <Text>Add new vehicle</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ marginTop: 10 }}></View>
+
+            {/* fetch and display pick up location */}
+            <View>
+              <Text style={styles.page_text}>Pickup location:</Text>
+            </View>
+            <View style={styles.pickerContainer}>
+              <Picker
+                style={styles.pickerStyle}
+                selectedValue={this.state.selectedPickupLocationId}
+                onValueChange={(locationId, index) => {
+                  this.setState({ selectedPickupLocationId: locationId });
+                }}
+              >
+                {pickOrDropLocations}
+              </Picker>
+            </View>
+            <View style={{ marginTop: 10 }}></View>
+
+            {/* fetch and display drop location */}
+            <View>
+              <Text style={styles.page_text}>Drop location:</Text>
+            </View>
+            <View style={styles.pickerContainer}>
+              <Picker
+                style={styles.pickerStyle}
+                selectedValue={this.state.selectedDropLocationId}
+                onValueChange={(locationId, index) => {
+                  this.setState({ selectedDropLocationId: locationId });
+                }}
+              >
+                {pickOrDropLocations}
+              </Picker>
+            </View>
+            <View style={{ marginTop: 10 }}></View>
+            {/* vehicle pick up time  */}
+            <View style={styles.pickupTimeContainer}>
+              <View style={styles.pickupTimeLeftContainer}>
+                <Text style={styles.page_text}>Vehicle pick up time:</Text>
+              </View>
+              <View style={styles.pickupTimeRightContainer}>
+                <Button
+                  title="Fix me"
+                  onPress={() => {
+                    this.setState({ showVehiclePickupTimer: true });
+                  }}
+                />
+                {this.state.showVehiclePickupTimer && (
+                  <DateTimePicker
+                    value={this.state.vehiclePickupTime}
+                    onChange={this.setVehiclePickupTimer}
+                  />
+                )}
+              </View>
+            </View>
+
+            <View style={{ marginTop: 10 }}></View>
+
+            {/* fetch and display partner's payment modes */}
+            <View>
+              <Text style={styles.page_text}>Payment mode:</Text>
+            </View>
+            <View style={styles.pickerContainer}>
+              <Picker
+                style={styles.pickerStyle}
+                selectedValue={this.state.selectedPaymentModeId}
+                onValueChange={(paymentModeId, index) => {
+                  this.setState({ selectedPaymentModeId: paymentModeId });
+                }}
+              >
+                {paymentModes}
+              </Picker>
+            </View>
+
+            <View style={{ marginTop: 10 }}></View>
+            {/* order placement button */}
+            <View style={styles.submitButton}>
+              <TouchableOpacity
+                onPress={() => {
+                  console.log("Implement final order call");
+                  console.log(
+                    "Selected vehicle:" + this.state.selectedVehicleId
+                  );
+                }}
+              >
+                <Text>Place service request</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={{ marginTop: 100 }}></View>
+        </ScrollView>
       </View>
     );
   }
@@ -261,7 +380,6 @@ function FailureView() {
 
 const styles = StyleSheet.create({
   container: {
-    margin: 8,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#68a0cf",
@@ -270,7 +388,7 @@ const styles = StyleSheet.create({
   page_text: {
     margin: 8,
     fontWeight: "bold",
-    fontSize: 18
+    fontSize: 16
   },
   item_separator: {
     height: 1,
@@ -314,9 +432,49 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#CCCCCC",
-    margin: 1,
+    margin: 10,
     backgroundColor: "#F4F4F4",
-    alignItems: "center"
+    alignItems: "center",
+    fontSize: 16
+  },
+  pickupTimeContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.containerBg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderColor
+  },
+  pickupTimeLeftContainer: {
+    flex: 3,
+    alignItems: "flex-start"
+  },
+  pickupTimeRightContainer: {
+    flex: 1,
+    marginLeft: 10,
+    marginRight: 20
+    //alignItems: "center"
+  },
+  addVehicleButton: {
+    borderRadius: 8,
+    flex: 1,
+    backgroundColor: "#317cd4",
+    height: 40,
+    marginLeft: 50,
+    marginRight: 50,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  submitButton: {
+    borderRadius: 8,
+    flex: 1,
+    backgroundColor: "#317cd4",
+    height: 40,
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 20,
+    alignItems: "center",
+    justifyContent: "center"
   }
 });
 
