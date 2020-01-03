@@ -28,6 +28,11 @@ const styles = StyleSheet.create({
   linkText: {
     color: colors.primary,
     fontWeight: "700"
+  },
+  activityIndicator: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
   }
 });
 

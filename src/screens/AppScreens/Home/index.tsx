@@ -5,7 +5,9 @@ import {
   FlatList,
   Picker,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  Modal,
+  ActivityIndicator
 } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Header } from "../../../components";
@@ -40,6 +42,8 @@ interface HomeState {
   selectedPlaceId: string;
   searchTerm: string;
   userId: string;
+  modalVisible: boolean;
+  showActivityIndicator: boolean;
 }
 
 interface Place {
@@ -57,7 +61,9 @@ class Home extends Component<Props, HomeState> {
       places: [],
       selectedPlaceId: "",
       searchTerm: "",
-      userId: ""
+      userId: "",
+      modalVisible: false,
+      showActivityIndicator: false
     }),
       AsyncStorage.getItem("userToken").then(value => {
         const userValues = JSON.parse(value);
@@ -82,7 +88,9 @@ class Home extends Component<Props, HomeState> {
       .then(res => {
         this.setState({
           partners: res,
-          serviceCentresBackup: res
+          serviceCentresBackup: res,
+          modalVisible: false,
+          showActivityIndicator: false
         });
       })
       .catch(console.log);
@@ -131,7 +139,11 @@ class Home extends Component<Props, HomeState> {
             style={styles.pickerStyle}
             selectedValue={this.state.selectedPlaceId}
             onValueChange={(value, index) => {
-              this.setState({ selectedPlaceId: value });
+              this.setState({
+                selectedPlaceId: value,
+                modalVisible: true,
+                showActivityIndicator: true
+              });
               this.getServiceCentres(value);
             }}
           >
@@ -145,6 +157,22 @@ class Home extends Component<Props, HomeState> {
           style={styles.searchInput}
           placeholder="Enter service centre name"
         />
+        <Modal
+          animationType={"fade"}
+          transparent={true}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {
+            console.log("Modal has been closed.");
+          }}
+        >
+          <View style={styles.activityIndicator}>
+            <ActivityIndicator
+              size="large"
+              color="#8acefa"
+              animating={this.state.showActivityIndicator}
+            />
+          </View>
+        </Modal>
         {this.state.partners.length > 0 ? (
           <FlatList
             data={this.state.partners}

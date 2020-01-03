@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { View, Text, KeyboardAvoidingView, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  KeyboardAvoidingView,
+  ScrollView,
+  Modal,
+  ActivityIndicator
+} from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -31,7 +38,20 @@ const loginSchema = Yup.object().shape({
     .required()
 });
 
-class Login extends Component<Props, {}> {
+interface LoginState {
+  modalVisible: boolean;
+  showActivityIndicator: boolean;
+}
+
+class Login extends Component<Props, LoginState> {
+  constructor(Props) {
+    super(Props);
+    this.state = {
+      modalVisible: false,
+      showActivityIndicator: false
+    };
+  }
+
   isValidCredentials = function() {
     let isValid = AsyncStorage.getItem("userToken");
     return isValid != undefined;
@@ -43,9 +63,17 @@ class Login extends Component<Props, {}> {
     loginUserService(values.mobileNumber, values.password).then(res => {
       if (res["errorCode"] == undefined || res["errorCode"] == "") {
         AsyncStorage.setItem("userToken", JSON.stringify(res));
+        this.setState({
+          modalVisible: false,
+          showActivityIndicator: false
+        });
         Alert.alert("Logged in Successfully");
         navigation.navigate("AppStack");
       } else {
+        this.setState({
+          modalVisible: false,
+          showActivityIndicator: false
+        });
         Alert.alert(res["errorMessage"]);
       }
     });
@@ -59,7 +87,13 @@ class Login extends Component<Props, {}> {
             <Formik
               initialValues={{ mobileNumber: "", password: "" }}
               validationSchema={loginSchema}
-              onSubmit={values => this.handleLogin(values)}
+              onSubmit={values => {
+                this.setState({
+                  modalVisible: true,
+                  showActivityIndicator: true
+                });
+                this.handleLogin(values);
+              }}
             >
               {props => {
                 return (
@@ -70,6 +104,23 @@ class Login extends Component<Props, {}> {
                         Build Something Amazing
                       </Text>
                     </View>
+
+                    <Modal
+                      animationType={"fade"}
+                      transparent={true}
+                      visible={this.state.modalVisible}
+                      onRequestClose={() => {
+                        console.log("Modal has been closed.");
+                      }}
+                    >
+                      <View style={styles.activityIndicator}>
+                        <ActivityIndicator
+                          size="large"
+                          color="#8acefa"
+                          animating={this.state.showActivityIndicator}
+                        />
+                      </View>
+                    </Modal>
 
                     <View style={styles.inputContainer}>
                       <Input
