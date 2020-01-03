@@ -169,6 +169,28 @@ export async function userRegistrationService(
     });
 }
 
+export async function createServiceRequest(serviceRequest) {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/orders`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: serviceRequest
+  })
+    .then(res => res.json())
+    .then(response => {
+      console.log("Service request placed successfully");
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+      console.log("Failed to place a service request " + error);
+    });
+}
+
 export async function getPartnerPaymentMode(partnerId: String) {
   const token = await getOauthAccessToken();
   return fetch(`${urls.Base}/partners/${partnerId}/paymentmodes`, {

@@ -16,7 +16,8 @@ import {
   logoutUserService,
   getAllUserVehicles,
   getPickupAndDropLocations,
-  getPartnerPaymentMode
+  getPartnerPaymentMode,
+  createServiceRequest
 } from "../../../redux/services/user";
 import { colors } from "../../../constants";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -54,7 +55,19 @@ interface PaymentMode {
   details: string;
 }
 
+interface OrderRequest {
+  partnerId: string;
+  userId: string;
+  vehicleId: string;
+  pickUpLocationId: string;
+  dropLocationId: string;
+  paymentModeCode: number;
+  serviceTypeCode: number;
+  vehiclePickUpTime: Date;
+}
+
 interface OrderState {
+  serviceCenter: ParterDetails;
   vehicles: UserVehicle[];
   pickOrDropLocations: PickOrDropLocation[];
   paymentModes: PaymentMode[];
@@ -81,7 +94,8 @@ class OrderRequest extends Component<Props, OrderState> {
       selectedDropLocationId: "",
       selectedPaymentModeId: "",
       vehiclePickupTime: new Date(),
-      showVehiclePickupTimer: false
+      showVehiclePickupTimer: false,
+      serviceCenter: null
     };
   }
 
@@ -100,7 +114,10 @@ class OrderRequest extends Component<Props, OrderState> {
 
     const serviceCenter = navigation.getParam("serviceCenter", "");
     getPartnerPaymentMode(serviceCenter.partnerId).then(paymentModes => {
-      this.setState({ paymentModes: paymentModes });
+      this.setState({
+        paymentModes: paymentModes,
+        serviceCenter: serviceCenter
+      });
     });
   }
 
@@ -122,6 +139,27 @@ class OrderRequest extends Component<Props, OrderState> {
     this.setState({
       showVehiclePickupTimer: Platform.OS === "ios" ? true : false,
       vehiclePickupTime: date
+    });
+  };
+
+  submitServiceRequest = () => {
+    let serviceRequestDetails = JSON.stringify({
+      partnerId: this.state.serviceCenter.partnerId,
+      userId: this.state.userId,
+      vehicleId: this.state.selectedVehicleId,
+      pickUpLocationId: this.state.selectedPickupLocationId,
+      dropLocationId: this.state.selectedDropLocationId,
+      paymentModeCode: 1, //FIXME: design/schema needs to be changed
+      serviceTypeCode: 1, // should come from earlier page
+      vehiclePickUpTime: this.state.vehiclePickupTime
+    });
+    createServiceRequest(serviceRequestDetails).then(response => {
+      if (response["errorCode"] == undefined || response["errorCode"] == "") {
+        Alert.alert("Service request placed successfully");
+        this.props.navigation.navigate("Orders");
+      } else {
+        Alert.alert("Failed to place a service request");
+      }
     });
   };
 
@@ -355,14 +393,7 @@ class OrderRequest extends Component<Props, OrderState> {
             <View style={{ marginTop: 10 }}></View>
             {/* order placement button */}
             <View style={styles.submitButton}>
-              <TouchableOpacity
-                onPress={() => {
-                  console.log("Implement final order call");
-                  console.log(
-                    "Selected vehicle:" + this.state.selectedVehicleId
-                  );
-                }}
-              >
+              <TouchableOpacity onPress={this.submitServiceRequest}>
                 <Text>Place service request</Text>
               </TouchableOpacity>
             </View>
