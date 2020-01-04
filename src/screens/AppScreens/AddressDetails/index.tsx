@@ -13,13 +13,15 @@ import { NavigationScreenProp, NavigationState } from "react-navigation";
 import styles from "./styles";
 import { CommonButton } from "../../../components";
 import {
-  logoutUserService,
-  getUserAddressService,
-  userDeleteAddressService
-} from "../../../redux/services/user";
+  userDeleteVehicleService,
+  userAddVehicleService,
+  userUpdateVehicleService
+} from "../../../redux/services/VehicleService";
+import {   logoutUserService } from "../../../redux/services/user";
 import { colors } from "../../../constants";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import AddressFlatList from "./AddressFlatList";
+
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;

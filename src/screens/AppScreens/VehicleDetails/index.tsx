@@ -1,14 +1,11 @@
 import React, { Component } from "react";
-import { View, FlatList, ActivityIndicator,AsyncStorage,Text,StyleSheet  } from "react-native";
+import { View, FlatList,AsyncStorage,Text,StyleSheet, Button  } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
-import { connect } from "react-redux";
 import { Header } from "../../../components";
 import styles from "./styles";
-import { AvatarItem,Input, CommonButton } from "../../../components";
-import { logoutUserService,getUserVehicles } from "../../../redux/services/user";
-import {NavigationEvents} from 'react-navigation';
-import AwesomeButton from "react-native-really-awesome-button";
-import { colors } from "../../../constants";
+import { CommonButton } from "../../../components";
+import { logoutUserService,getAllUserVehicles } from "../../../redux/services/user";
+import { Vehicle } from "../../../redux/model/vehicle";
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
@@ -23,16 +20,20 @@ interface State {
   limit: number;
   values: string;
   vehicles: Array<Object>;
+  refresh: boolean;
 }
 
 class VehicleDetails extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
+    this.addNewVehicle = this.addNewVehicle.bind(this);
+    this.updateVehicle = this.updateVehicle.bind(this);
     this.state = {
       page: 1,
       limit: 20,
       values:"",
-      vehicles:[]
+      vehicles: [],
+      refresh: true
     };
   }
 
@@ -48,19 +49,50 @@ class VehicleDetails extends Component<Props, State> {
         }
       ]
     
-    this.setState({ vehicles: values });
-   // this.setState({values:values});
-    // AsyncStorage.getItem('userToken').then((value) =>{
-    //     this.setState({values:JSON.parse(value)});
-    //     }).then(res => {
-    //       console.log(this.state.values.userId);
-    //       getUserVehicles(this.state.values.userId)
-    //         .then(res =>{
-    //                 this.setState({ vehicles: res });
-    //                 console.log(this.state.vehicles[0].manufacturerName);
-    //               })
-    //         .catch(console.log)
-    //     });
+    //this.setState({ vehicles: values });
+   //this.setState({values:values});
+    AsyncStorage.getItem('userToken').then((value) =>{
+        this.setState({values:JSON.parse(value)});
+        }).then(res => {
+          console.log("User Id "+this.state.values.userId);
+          getAllUserVehicles(this.state.values.userId)
+            .then(res =>{
+                    this.setState({ vehicles: res,
+                      refresh: !this.state.refresh
+                     });
+                    console.log(this.state.vehicles);
+                    
+                  })
+            .catch(console.log)
+        });
+  }
+
+  addNewVehicle(vehicle: Vehicle) {
+    if (vehicle != undefined && vehicle != null) {
+      let updatedVehicles = this.state.vehicles;
+      updatedVehicles.push(vehicle);
+      this.setState({
+        vehicles: updatedVehicles,
+        refresh: !this.state.refresh
+      });
+    } else {
+      console.log("naaa ..........");
+    }
+  }
+
+  updateVehicle(vehicle: Vehicle) {
+    if (vehicle != undefined && vehicle != null) {
+      let filteredVehicles = this.state.vehicles.filter(
+        veh => veh.vehicleId != vehicle.vehicleId
+      );
+      filteredVehicles.push(vehicle);
+      this.setState({
+        vehicles: filteredVehicles,
+        refresh: !this.state.refresh
+      });
+    } else {
+      console.log("error: no address found to update");
+    }
   }
 
   handleLogout = () => {
@@ -72,9 +104,16 @@ class VehicleDetails extends Component<Props, State> {
 
   handleUpdate = (vehicle) => {
     const { navigation } = this.props;
-    logoutUserService().then(() => {
-      navigation.navigate("AuthStack");
-    });
+    this.props.navigation.navigate("AddVehicle", {
+      manufacturerName: vehicle.manufacturerName,
+      model: vehicle.model,
+      registrationNumber: vehicle.registrationNumber,
+      userId: vehicle.userId,
+      vehicleId: vehicle.vehicleId,
+      vehicleTypeCode: vehicle.vehicleTypeCode,
+      buttonText: "Update Vehicle",
+      updateVehicle: this.updateVehicle
+      })
   };
   handleDelete = (vehicle) => {
     const { navigation } = this.props;
@@ -94,6 +133,7 @@ class VehicleDetails extends Component<Props, State> {
         />
         <FlatList
           data={this.state.vehicles}
+          extraData={this.state.refresh}
           keyExtractor={(x, i) => i.toString()}
           renderItem={({ item }) =>
           <View style={styles.vehicleContainer}>
@@ -139,14 +179,31 @@ class VehicleDetails extends Component<Props, State> {
             </View>
           </View>
         }/>
-        
+        <View style={styles1.container}>
+          <Button
+            title="Add New Vehicle"
+            color="#3F51B5"
+            onPress={() =>
+              navigation.navigate("AddVehicle", {
+                addNewVehicle: this.addNewVehicle,
+                buttonText: "Add Vehicle"
+              })
+            }
+          />
+        </View>
       </View>
     );
   }
 }
 
 const styles1 = StyleSheet.create({
-
+  container: {
+    margin: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#68a0cf",
+    backgroundColor: "white"
+  },
 
 });
 export default VehicleDetails;

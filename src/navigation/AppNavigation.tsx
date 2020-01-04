@@ -9,6 +9,7 @@ import Blank from "../screens/AppScreens/Blank";
 import Orders from "../screens/AppScreens/Orders";
 import AddressDetails from "../screens/AppScreens/AddressDetails";
 import VehicleDetails from "../screens/AppScreens/VehicleDetails";
+import AddVehicle from "../screens/AppScreens/VehicleDetails/AddVehicle";
 import SideBar from "../screens/AppScreens/SideBar";
 import Login from "../screens/AuthScreens/Login";
 import AuthLoading from "../screens/AuthLoading";
@@ -33,7 +34,8 @@ const MainStack = createStackNavigator(
     AddAddress: AddAddress,
     ServiceCenterDetails: ServiceCenterDetails,
     OrderRequest: OrderRequest,
-    OrderSummary: OrderSummary
+    OrderSummary: OrderSummary,
+    AddVehicle:AddVehicle
   },
   {
     initialRouteName: "Home",

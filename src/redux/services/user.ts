@@ -24,7 +24,7 @@ export function fetchImageService(page?: number, limit?: number) {
  * token in asyncstorage. If current token is expired then it will fetch and return
  * a new access token.
  */
-const getOauthAccessToken = async () => {
+export const getOauthAccessToken = async () => {
   //checking if we already have oauth token
   const currentToken = await AsyncStorage.getItem("accessToken");
   const expiryTime = await AsyncStorage.getItem("accessTokenExpiryTime");
@@ -84,6 +84,7 @@ const getOauthAccessToken = async () => {
   AsyncStorage.setItem("accessTokenExpiryTime", tokenExpiryTime.toString());
 
   return responseJson["access_token"];
+  //return "hgjhgjh";
 };
 
 export async function loginUserService(username: string, password: string) {
@@ -116,22 +117,31 @@ export async function loginUserService(username: string, password: string) {
 }
 
 export async function getAllUserVehicles(userId: string) {
-  let userVehicles = await AsyncStorage.getItem("userVehicles");
-  if (userVehicles == undefined) {
+  // let userVehicles = await AsyncStorage.getItem("userVehicles");
+  // if (userVehicles == undefined) {
     const token = await getOauthAccessToken();
-    const response = await fetch(`${urls.Base}/users/${userId}/vehicles`, {
+    return fetch(`${urls.Base}/users/${userId}/vehicles`, {
       method: "GET",
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json"
       }
+
+    }).then(res => res.json())
+    .then(response => {
+      console.log("Successfully retrieved user vehicles"+ JSON.stringify(response));
+      //userVehicles = JSON.stringify(response);
+     // AsyncStorage.setItem("userVehicles", userVehicles);
+      return response;
+    })
+    .catch(error => {
+      console.log("failed to get user vehicles " + error);
     });
-    const responseJson = await response.json();
-    userVehicles = JSON.stringify(responseJson);
-    AsyncStorage.setItem("userVehicles", userVehicles);
-  }
-  return userVehicles;
+  // }else{
+  //   return userVehicles;
+  // }
+  
 }
 
 export async function userRegistrationService(
@@ -265,7 +275,7 @@ export async function getUserVehicles(userId: string) {
   })
     .then(res => res.json())
     .then(response => {
-      console.log("Successfully retrieved user vehicles");
+      console.log("Successfully retrieved user vehicles"+ JSON.stringify(response));
       return response;
     })
     .catch(error => {

@@ -61,7 +61,7 @@ class Login extends Component<Props, LoginState> {
     const { navigation } = this.props;
 
     loginUserService(values.mobileNumber, values.password).then(res => {
-      if (res["errorCode"] == undefined || res["errorCode"] == "") {
+      if (res != undefined && (res["errorCode"] == undefined || res["errorCode"] == "")) {
         AsyncStorage.setItem("userToken", JSON.stringify(res));
         this.setState({
           modalVisible: false,
@@ -74,7 +74,7 @@ class Login extends Component<Props, LoginState> {
           modalVisible: false,
           showActivityIndicator: false
         });
-        Alert.alert(res["errorMessage"]);
+        Alert.alert(res!=undefined? res["errorMessage"]:"");
       }
     });
   };
