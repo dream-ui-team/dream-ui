@@ -5,12 +5,10 @@ import {
   Text,
   TouchableOpacity,
   Picker,
-  Button,
-  Platform,
   Alert,
   ScrollView
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker from "react-native-modal-datetime-picker";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import {
   logoutUserService,
@@ -75,9 +73,10 @@ interface OrderState {
   selectedVehicleId: string;
   selectedPickupLocationId: string;
   selectedDropLocationId: string;
-  selectedPaymentModeId: string;
+  selectedPaymentMode: string;
   vehiclePickupTime: Date;
   showVehiclePickupTimer: boolean;
+  showSelectedVehiclePickupTime: boolean;
 }
 
 class OrderRequest extends Component<Props, OrderState> {
@@ -92,9 +91,10 @@ class OrderRequest extends Component<Props, OrderState> {
       selectedVehicleId: "",
       selectedPickupLocationId: "",
       selectedDropLocationId: "",
-      selectedPaymentModeId: "",
+      selectedPaymentMode: "",
       vehiclePickupTime: new Date(),
       showVehiclePickupTimer: false,
+      showSelectedVehiclePickupTime: false,
       serviceCenter: null
     };
   }
@@ -134,11 +134,18 @@ class OrderRequest extends Component<Props, OrderState> {
     return true;
   }
 
-  setVehiclePickupTimer = (event, date) => {
-    date = date || this.state.vehiclePickupTime;
+  setVehiclePickupTimer = date => {
     this.setState({
-      showVehiclePickupTimer: Platform.OS === "ios" ? true : false,
-      vehiclePickupTime: date
+      showVehiclePickupTimer: false,
+      vehiclePickupTime: date,
+      showSelectedVehiclePickupTime: true
+    });
+  };
+
+  hideDateTimePicker = () => {
+    this.setState({
+      showVehiclePickupTimer: false,
+      showSelectedVehiclePickupTime: false
     });
   };
 
@@ -149,14 +156,19 @@ class OrderRequest extends Component<Props, OrderState> {
       vehicleId: this.state.selectedVehicleId,
       pickUpLocationId: this.state.selectedPickupLocationId,
       dropLocationId: this.state.selectedDropLocationId,
-      paymentModeCode: 1, //FIXME: design/schema needs to be changed
-      serviceTypeCode: 1, // should come from earlier page
+      paymentMode: this.state.selectedPaymentMode,
+      serviceType: "servicing", // should come from earlier page
       vehiclePickUpTime: this.state.vehiclePickupTime
     });
     createServiceRequest(serviceRequestDetails).then(response => {
-      if (response["errorCode"] == undefined || response["errorCode"] == "") {
+      if (
+        (response["errorCode"] == undefined || response["errorCode"] == "") &&
+        response["error"] == undefined
+      ) {
         Alert.alert("Service request placed successfully");
-        this.props.navigation.navigate("Orders");
+        this.props.navigation.navigate("OrderSummary", {
+          response: response
+        });
       } else {
         Alert.alert("Failed to place a service request");
       }
@@ -231,7 +243,7 @@ class OrderRequest extends Component<Props, OrderState> {
         <Picker.Item
           key={partnerPaymentModes[i].id}
           label={partnerPaymentModes[i].paymentMode}
-          value={partnerPaymentModes[i].id}
+          value={partnerPaymentModes[i].paymentMode}
         />
       );
     }
@@ -302,7 +314,11 @@ class OrderRequest extends Component<Props, OrderState> {
               </Picker>
             </View>
             <View>
-              <Text style={{ textAlign: "center", fontSize: 18 }}>OR</Text>
+              <Text
+                style={{ textAlign: "center", marginBottom: 5, fontSize: 18 }}
+              >
+                OR
+              </Text>
             </View>
             <View style={styles.addVehicleButton}>
               <TouchableOpacity
@@ -352,24 +368,42 @@ class OrderRequest extends Component<Props, OrderState> {
             </View>
             <View style={{ marginTop: 10 }}></View>
             {/* vehicle pick up time  */}
+            <View>
+              <Text style={styles.page_text}>Vehicle pick up time:</Text>
+            </View>
             <View style={styles.pickupTimeContainer}>
               <View style={styles.pickupTimeLeftContainer}>
-                <Text style={styles.page_text}>Vehicle pick up time:</Text>
-              </View>
-              <View style={styles.pickupTimeRightContainer}>
-                <Button
-                  title="Fix me"
+                <TouchableOpacity
+                  style={styles.datetimeButton}
                   onPress={() => {
                     this.setState({ showVehiclePickupTimer: true });
                   }}
+                >
+                  <Text>Select date and time</Text>
+                </TouchableOpacity>
+                <DateTimePicker
+                  isVisible={this.state.showVehiclePickupTimer}
+                  onConfirm={this.setVehiclePickupTimer}
+                  onCancel={this.hideDateTimePicker}
+                  mode="datetime"
                 />
-                {this.state.showVehiclePickupTimer && (
-                  <DateTimePicker
-                    value={this.state.vehiclePickupTime}
-                    onChange={this.setVehiclePickupTimer}
-                  />
-                )}
               </View>
+              {this.state.showSelectedVehiclePickupTime && (
+                <View style={styles.pickupTimeRightContainer}>
+                  <Text style={{ fontSize: 16 }}>
+                    {this.state.vehiclePickupTime.getDate() +
+                      "/" +
+                      this.state.vehiclePickupTime.getMonth() +
+                      1 +
+                      "/" +
+                      this.state.vehiclePickupTime.getFullYear() +
+                      " " +
+                      this.state.vehiclePickupTime.getHours() +
+                      ":" +
+                      this.state.vehiclePickupTime.getMinutes()}
+                  </Text>
+                </View>
+              )}
             </View>
 
             <View style={{ marginTop: 10 }}></View>
@@ -381,9 +415,9 @@ class OrderRequest extends Component<Props, OrderState> {
             <View style={styles.pickerContainer}>
               <Picker
                 style={styles.pickerStyle}
-                selectedValue={this.state.selectedPaymentModeId}
-                onValueChange={(paymentModeId, index) => {
-                  this.setState({ selectedPaymentModeId: paymentModeId });
+                selectedValue={this.state.selectedPaymentMode}
+                onValueChange={(paymentMode, index) => {
+                  this.setState({ selectedPaymentMode: paymentMode });
                 }}
               >
                 {paymentModes}
@@ -406,7 +440,11 @@ class OrderRequest extends Component<Props, OrderState> {
 }
 
 function FailureView() {
-  return <View>Failed select partner, please try again ...!!!</View>;
+  return (
+    <View>
+      <Text>Failed select partner, please try again ...!!!</Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -466,35 +504,40 @@ const styles = StyleSheet.create({
     margin: 10,
     backgroundColor: "#F4F4F4",
     alignItems: "center",
-    fontSize: 16
+    fontSize: 16,
+    marginLeft: 40,
+    marginRight: 40
   },
   pickupTimeContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: colors.containerBg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderColor
+    alignItems: "center"
   },
   pickupTimeLeftContainer: {
-    flex: 3,
-    alignItems: "flex-start"
+    flex: 2.5,
+    alignItems: "flex-start",
+    marginLeft: 10
   },
   pickupTimeRightContainer: {
-    flex: 1,
-    marginLeft: 10,
-    marginRight: 20
-    //alignItems: "center"
+    flex: 1.7,
+    marginRight: 10,
+    borderWidth: 1,
+    padding: 5,
+    height: 40,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center"
   },
   addVehicleButton: {
     borderRadius: 8,
     flex: 1,
     backgroundColor: "#317cd4",
-    height: 40,
-    marginLeft: 50,
-    marginRight: 50,
+    height: 50,
+    marginLeft: 40,
+    marginRight: 40,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    fontSize: 16
   },
   submitButton: {
     borderRadius: 8,
@@ -506,6 +549,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignItems: "center",
     justifyContent: "center"
+  },
+  datetimeButton: {
+    borderRadius: 8,
+    backgroundColor: "#317cd4",
+    height: 40,
+    marginLeft: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 5
   }
 });
 

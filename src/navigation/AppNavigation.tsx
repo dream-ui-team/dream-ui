@@ -18,6 +18,7 @@ import MyProfileDetails from "../screens/AppScreens/MyProfileDetails";
 import AddAddress from "../screens/AppScreens/AddressDetails/AddAddress";
 import ServiceCenterDetails from "../screens/AppScreens/Home/ServiceCenterDetails";
 import OrderRequest from "../screens/AppScreens/Orders/OrderRequest";
+import OrderSummary from "../screens/AppScreens/Orders/OrderSummary";
 
 const { width } = Dimensions.get("window");
 
@@ -31,7 +32,8 @@ const MainStack = createStackNavigator(
     MyProfileDetails: MyProfileDetails,
     AddAddress: AddAddress,
     ServiceCenterDetails: ServiceCenterDetails,
-    OrderRequest: OrderRequest
+    OrderRequest: OrderRequest,
+    OrderSummary: OrderSummary
   },
   {
     initialRouteName: "Home",

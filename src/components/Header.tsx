@@ -1,8 +1,14 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform
+} from "react-native";
 import { colors } from "../constants";
 import Icon from "react-native-vector-icons/Ionicons";
-
+import { SafeAreaView } from "react-navigation";
 interface Props {
   title: string;
   leftButtonPress?: () => void;
@@ -13,26 +19,31 @@ export class Header extends Component<Props, {}> {
   render() {
     const { title, leftButtonPress, rightButtonPress } = this.props;
     return (
-      <View style={styles.container}>
-        <View style={styles.leftContainer}>
-          <TouchableOpacity style={styles.iconButton} onPress={leftButtonPress}>
-            <Icon name="ios-menu" size={24} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.midContainer}>
-          <Text style={styles.headerTitle}>{title}</Text>
-        </View>
-        <View style={styles.rightContainer}>
-          {rightButtonPress ? (
+      <SafeAreaView>
+        <View style={styles.container}>
+          <View style={styles.leftContainer}>
             <TouchableOpacity
               style={styles.iconButton}
-              onPress={rightButtonPress}
+              onPress={leftButtonPress}
             >
-              <Icon name="ios-power" size={24} />
+              <Icon name="ios-menu" size={24} />
             </TouchableOpacity>
-          ) : null}
+          </View>
+          <View style={styles.midContainer}>
+            <Text style={styles.headerTitle}>{title}</Text>
+          </View>
+          <View style={styles.rightContainer}>
+            {rightButtonPress ? (
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={rightButtonPress}
+              >
+                <Icon name="ios-power" size={24} />
+              </TouchableOpacity>
+            ) : null}
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 }

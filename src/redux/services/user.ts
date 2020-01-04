@@ -488,7 +488,26 @@ export async function getCostSheet(partnerId: string) {
       console.log("failed to download costsheet " + error);
     });
 }
-
+export async function getAllServiceRequestsByUserId(userId: String) {
+  const token = await getOauthAccessToken();
+  return fetch(`${urls.Base}/orders/users/${userId}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  })
+    .then(res => res.json())
+    .then(response => {
+      console.log("Successfully retrieved service requests for given user");
+      return response;
+    })
+    .catch(error => {
+      console.log(error);
+      console.log("Failed to retrieved service requests " + error);
+    });
+}
 export function logoutUserService() {
   return new Promise((resolve, reject) => {
     AsyncStorage.removeItem("accessToken");
