@@ -59,8 +59,7 @@ class VehicleDetails extends Component<Props, State> {
           getAllUserVehicles(this.state.values.userId)
             .then(res =>{
                     this.setState({ vehicles: JSON.parse(res),
-                      refresh: !this.state.refresh,
-                      show:true
+                      refresh: !this.state.refresh
                      });
                     console.log(this.state.vehicles);
 
