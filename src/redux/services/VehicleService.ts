@@ -20,12 +20,12 @@ export async function userDeleteVehicleService(
       }
     })
       .then(res => {
-        console.log("successfully deleted user address");
+        console.log("successfully deleted user Vehicle");
         return res;
       })
       .catch(error => {
         console.log(error);
-        console.log("failed to delete user address " + error);
+        console.log("failed to delete user vehicle " + error);
       });
   }
 
@@ -105,3 +105,5 @@ export async function userDeleteVehicleService(
         console.log("failed to updated user vehicle " + error);
       });
   }
+
+  

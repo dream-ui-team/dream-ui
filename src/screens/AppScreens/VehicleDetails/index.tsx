@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { View, FlatList,AsyncStorage,Text,StyleSheet, Button  } from "react-native";
+import { View, FlatList,AsyncStorage,Text,StyleSheet, Button, Alert  } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Header } from "../../../components";
 import styles from "./styles";
 import { CommonButton } from "../../../components";
-import { logoutUserService,getAllUserVehicles } from "../../../redux/services/user";
+import { logoutUserService, getAllUserVehicles } from "../../../redux/services/user";
+import { userDeleteVehicleService } from "../../../redux/services/VehicleService";
 import { Vehicle } from "../../../redux/model/vehicle";
 
 interface Props {
@@ -117,9 +118,21 @@ class VehicleDetails extends Component<Props, State> {
   };
   handleDelete = (vehicle) => {
     const { navigation } = this.props;
-    logoutUserService().then(() => {
-      navigation.navigate("AuthStack");
-    });
+    userDeleteVehicleService(this.state.values.userId, vehicle.vehicleId)
+      .then(res => {
+        if (res["errorCode"] == undefined || res["errorCode"] == "") {
+          let filteredVehicles = this.state.vehicles.filter(
+            veh => veh.vehicleId != vehicle.vehicleId
+          );
+          this.setState({
+            vehicles: filteredVehicles,
+            refresh: !this.state.refresh
+          });
+        } else {
+          Alert.alert("failed to delete the address");
+        }
+      })
+      .catch(console.log);
   };
 
   render() {
