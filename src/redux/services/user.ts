@@ -117,33 +117,28 @@ export async function loginUserService(username: string, password: string) {
 }
 
 export async function getAllUserVehicles(userId: string) {
-  // let userVehicles = await AsyncStorage.getItem("userVehicles");
-  // if (userVehicles == undefined) {
+   let userVehicles = await AsyncStorage.getItem("userVehicles");
+  //if (userVehicles == undefined) {
     const token = await getOauthAccessToken();
-    return fetch(`${urls.Base}/users/${userId}/vehicles`, {
+    const response = await fetch(`${urls.Base}/users/${userId}/vehicles`, {
       method: "GET",
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json"
       }
-
-    }).then(res => res.json())
-    .then(response => {
-      console.log("Successfully retrieved user vehicles"+ JSON.stringify(response));
-      //userVehicles = JSON.stringify(response);
-     // AsyncStorage.setItem("userVehicles", userVehicles);
-      return response;
-    })
-    .catch(error => {
-      console.log("failed to get user vehicles " + error);
     });
+
+      const responseJson = await response.json();
+      //responseJson = JSON.stringify(responseJson);
+      userVehicles = JSON.stringify(responseJson);
+      AsyncStorage.setItem("userVehicles", userVehicles);
+//  }
+    return userVehicles;
   // }else{
   //   return userVehicles;
   // }
-  
 }
-
 export async function userRegistrationService(
   mobileNum: string,
   password: string,

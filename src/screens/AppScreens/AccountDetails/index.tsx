@@ -1,7 +1,19 @@
 import React, { Component } from "react";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { Container,
+Header,
+Content,
+Card,
+CardItem,
+Body,
+Text,
+Left,
+Right,
+Button,
+Title,
+Icon } from 'native-base';
 import { NavigationScreenProp, NavigationState } from "react-navigation";
-import { Header } from "../../../components";
+//import { Header } from "../../../components";
 import { AsyncStorage } from "react-native";
 import { logoutUserService } from "../../../redux/services/user";
 
@@ -12,6 +24,7 @@ interface Props {
 class AccountDetails extends Component<Props, { myProfileData }> {
   constructor(props) {
     super(props);
+      this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     this.state = {
       myProfileData: []
     };
@@ -22,7 +35,11 @@ class AccountDetails extends Component<Props, { myProfileData }> {
       this.setState({ myProfileData: JSON.parse(value) });
     });
   }
-
+  handleBackButtonClick() {
+    const { navigation } = this.props;
+    navigation.navigate("Home");
+    return true;
+  }
   handleLogout = () => {
     const { navigation } = this.props;
     logoutUserService().then(() => {
@@ -33,38 +50,52 @@ class AccountDetails extends Component<Props, { myProfileData }> {
   render() {
     const { navigation } = this.props;
     return (
-      <View style={styles.container}>
-        <Header
-          title="My account details"
-          leftButtonPress={() => navigation.openDrawer()}
-          rightButtonPress={() => this.handleLogout()}
-        />
-
-        <TouchableOpacity
-          style={styles.ProfileButton}
-          onPress={() =>
-            navigation.navigate("MyProfileDetails", {
-              values: this.state.myProfileData
-            })
-          }
-        >
-          <Text> My profile </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.AddressButton}
-          onPress={() => this.props.navigation.navigate("AddressDetails")}
-        >
-          <Text> My addresses </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.ProfileButton}
-          onPress={() => navigation.navigate("VehicleDetails")}
-        >
-          <Text> My vehicles </Text>
-        </TouchableOpacity>
-      </View>
+      <Container>
+      <Header>
+        <Left>
+          <Button transparent onPress={this.handleBackButtonClick}>
+            <Icon name="arrow-back" size={24} />
+          </Button>
+        </Left>
+        <Body>
+          <Title styles={{paddingLeft:15}}>My Account details</Title>
+        </Body>
+        <Right />
+      </Header>
+       <Content>
+         <Card>
+           <CardItem>
+             <Icon active name="person" />
+             <Text>My Profile</Text>
+             <Right>
+               <Icon name="arrow-forward"   onPress={() =>
+                   navigation.navigate("MyProfileDetails", {
+                     values: this.state.myProfileData
+                   })
+                 }/>
+             </Right>
+            </CardItem>
+          </Card>
+          <Card>
+            <CardItem>
+              <Icon active name="home" />
+              <Text>My Address</Text>
+              <Right>
+                <Icon name="arrow-forward"    onPress={() => this.props.navigation.navigate("AddressDetails")}/>
+              </Right>
+             </CardItem>
+           </Card>
+           <Card>
+             <CardItem>
+               <Icon active name="car" />
+               <Text>My Vehicles</Text>
+               <Right>
+                 <Icon name="arrow-forward"   onPress={() => navigation.navigate("VehicleDetails")}/>
+               </Right>
+              </CardItem>
+            </Card>
+       </Content>
+     </Container>
     );
   }
 }

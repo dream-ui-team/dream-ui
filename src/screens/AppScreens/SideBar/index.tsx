@@ -26,7 +26,7 @@ class SideBar extends Component<Props, {}> {
     let fTitle = "Welcome"+" "+`${this.state.values.firstName}`
     return (
       <View style={styles.container}>
-        <ListItem title={fTitle}>
+        <ListItem title={fTitle} onPress={() => navigation.navigate("AccountDetails")}>
         </ListItem>
         <ListItem title="Home" onPress={() => navigation.navigate("Home")} />
         <ListItem
@@ -44,7 +44,7 @@ class SideBar extends Component<Props, {}> {
           title="Blank Page"
           onPress={() => navigation.navigate("Blank")}
         />
-		
+
       </View>
     );
   }

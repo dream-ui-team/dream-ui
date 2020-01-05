@@ -40,7 +40,7 @@ class VehicleDetails extends Component<Props, State> {
 
   componentDidMount() {
     console.log("mounted");
-    let values= 
+    let values=
       [
         {
       'model':'Maruti Swift Dezire',
@@ -49,7 +49,7 @@ class VehicleDetails extends Component<Props, State> {
       'vehicleTypeCode': 2
         }
       ]
-    
+
     //this.setState({ vehicles: values });
    //this.setState({values:values});
     AsyncStorage.getItem('userToken').then((value) =>{
@@ -58,11 +58,12 @@ class VehicleDetails extends Component<Props, State> {
           console.log("User Id "+this.state.values.userId);
           getAllUserVehicles(this.state.values.userId)
             .then(res =>{
-                    this.setState({ vehicles: res,
-                      refresh: !this.state.refresh
+                    this.setState({ vehicles: JSON.parse(res),
+                      refresh: !this.state.refresh,
+                      show:true
                      });
                     console.log(this.state.vehicles);
-                    
+
                   })
             .catch(console.log)
         });
@@ -144,6 +145,7 @@ class VehicleDetails extends Component<Props, State> {
           leftButtonPress={() => navigation.openDrawer()}
           rightButtonPress={() => this.handleLogout()}
         />
+        {this.state.vehicles.length>0 ? (
         <FlatList
           data={this.state.vehicles}
           extraData={this.state.refresh}
@@ -192,6 +194,7 @@ class VehicleDetails extends Component<Props, State> {
             </View>
           </View>
         }/>
+      ):(<View><Text>Please Add your vehicle</Text></View>)}
         <View style={styles1.container}>
           <Button
             title="Add New Vehicle"

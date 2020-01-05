@@ -17,7 +17,7 @@ import {
   userAddVehicleService,
   userUpdateVehicleService
 } from "../../../redux/services/VehicleService";
-import {   logoutUserService } from "../../../redux/services/user";
+import {   logoutUserService,userDeleteAddressService,getUserAddressService } from "../../../redux/services/user";
 import { colors } from "../../../constants";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import AddressFlatList from "./AddressFlatList";

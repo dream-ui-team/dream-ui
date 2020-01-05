@@ -35,7 +35,8 @@ const MainStack = createStackNavigator(
     ServiceCenterDetails: ServiceCenterDetails,
     OrderRequest: OrderRequest,
     OrderSummary: OrderSummary,
-    AddVehicle:AddVehicle
+    AddVehicle:AddVehicle,
+    VehicleDetails:VehicleDetails
   },
   {
     initialRouteName: "Home",

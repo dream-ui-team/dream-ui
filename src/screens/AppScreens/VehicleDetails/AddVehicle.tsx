@@ -63,7 +63,7 @@ class AddVehicle extends Component<Props, State> {
         values.registrationNumber,
         this.state.loggedInUser.userId,
         values.vehicleId,
-        values.vehicleTypeCode 
+        values.vehicleTypeCode
       ).then(res => {
         if (res!= undefined && (res["errorCode"] == undefined || res["errorCode"] == "")) {
           console.log("address added successfully");
@@ -73,10 +73,10 @@ class AddVehicle extends Component<Props, State> {
             ""
           );
           addVehicleFunction(values);
-          Alert.alert("Address added Successfully");
+          Alert.alert("Vehicle added Successfully");
           navigation.navigate("VehicleDetails");
         } else {
-          Alert.alert("Failed to add a address");
+          Alert.alert("Failed to add a Vehicle");
         }
       });
     } else {
@@ -86,7 +86,7 @@ class AddVehicle extends Component<Props, State> {
         values.registrationNumber,
         this.state.loggedInUser.userId,
         values.vehicleId,
-        values.vehicleTypeCode 
+        values.vehicleTypeCode
       ).then(res => {
         if (res != undefined && (res["errorCode"] == undefined || res["errorCode"] == "")) {
           console.log("address updated successfully");
@@ -95,10 +95,10 @@ class AddVehicle extends Component<Props, State> {
             ""
           );
           updateVehicleFunction(values);
-          Alert.alert("Address updated successfully");
+          Alert.alert("Vehicle updated successfully");
           navigation.navigate("VehicleDetails");
         } else {
-          Alert.alert("Failed to update a address");
+          Alert.alert("Failed to update a vehicle");
         }
       });
     }
