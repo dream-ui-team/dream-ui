@@ -54,6 +54,8 @@ class AddVehicle extends Component<Props, State> {
 
   handleVehicleChange = (values: Vehicle) => {
     const { navigation } = this.props;
+    console.log( this.props );
+
     if (this.props.navigation.getParam("buttonText", "") == "Add Vehicle") {
       userAddVehicleService(
         values.manufacturerName,
@@ -63,7 +65,7 @@ class AddVehicle extends Component<Props, State> {
         values.vehicleId,
         values.vehicleTypeCode 
       ).then(res => {
-        if (res["errorCode"] == undefined || res["errorCode"] == "") {
+        if (res!= undefined && (res["errorCode"] == undefined || res["errorCode"] == "")) {
           console.log("address added successfully");
           values.vehicleId = res["vehicleId"];
           const addVehicleFunction = this.props.navigation.getParam(
@@ -86,7 +88,7 @@ class AddVehicle extends Component<Props, State> {
         values.vehicleId,
         values.vehicleTypeCode 
       ).then(res => {
-        if (res["errorCode"] == undefined || res["errorCode"] == "") {
+        if (res != undefined && (res["errorCode"] == undefined || res["errorCode"] == "")) {
           console.log("address updated successfully");
           const updateVehicleFunction = this.props.navigation.getParam(
             "updateVehicle",

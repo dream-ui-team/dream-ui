@@ -59,12 +59,12 @@ export async function userDeleteVehicleService(
     })
       .then(res => res.json())
       .then(response => {
-        console.log("successfully added user address");
+        console.log("successfully added user Vehicle");
         return response;
       })
       .catch(error => {
         console.log(error);
-        console.log("failed to add user address " + error);
+        console.log("failed to add user vehicle " + error);
       });
   }
   
@@ -78,6 +78,7 @@ export async function userDeleteVehicleService(
     vehicleTypeCode: number
   ) {
     const token = await getOauthAccessToken();
+    console.log(manufacturerName+ " "+ model + " "+ registrationNumber +" "+ userId+" "+ vehicleId+" "+ vehicleTypeCode);
     return fetch(`${urls.Base}/users/${userId}/vehicles`, {
       method: "PUT",
       headers: {
@@ -96,11 +97,11 @@ export async function userDeleteVehicleService(
     })
       .then(res => res.json())
       .then(response => {
-        console.log("successfully updated user address");
+        console.log("successfully updated user Vehicle");
         return response;
       })
       .catch(error => {
         console.log(error);
-        console.log("failed to updated user address " + error);
+        console.log("failed to updated user vehicle " + error);
       });
   }
