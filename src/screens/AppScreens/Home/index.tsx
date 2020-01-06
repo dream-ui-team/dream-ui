@@ -105,15 +105,25 @@ class Home extends Component<Props, HomeState> {
 
   render() {
     const { navigation } = this.props;
-    let places = this.state.places.map(p => {
-      return (
+    let places = [];
+    places.push(
+      <Picker.Item
+        key="do_not_pull_data"
+        label="Select Your Area"
+        value="do_not_pull_data"
+      />
+    );
+
+    let tempPlaces = this.state.places;
+    for (var i = 0; i < tempPlaces.length; i++) {
+      places.push(
         <Picker.Item
-          key={p.locationId}
-          label={p.locationName}
-          value={p.locationId}
+          key={tempPlaces[i].locationId}
+          label={tempPlaces[i].locationName}
+          value={tempPlaces[i].locationId}
         />
       );
-    });
+    }
     if (this.state.searchTerm != "") {
       var search = this.state.searchTerm.toString();
       var filteredPartners = this.state.partners.filter(function(partner) {
@@ -121,6 +131,13 @@ class Home extends Component<Props, HomeState> {
       });
       this.state.partners = filteredPartners;
       this.state.searchTerm = "";
+    }
+
+    let displayText = "";
+    if (this.state.selectedPlaceId == "do_not_pull_data") {
+      displayText = "Select your location from above drop down";
+    } else {
+      displayText = "Sorry, currently we are not serving at selected location";
     }
 
     return (
@@ -139,12 +156,18 @@ class Home extends Component<Props, HomeState> {
             style={styles.pickerStyle}
             selectedValue={this.state.selectedPlaceId}
             onValueChange={(value, index) => {
-              this.setState({
-                selectedPlaceId: value,
-                modalVisible: true,
-                showActivityIndicator: true
-              });
-              this.getServiceCentres(value);
+              if (value != "do_not_pull_data") {
+                this.setState({
+                  selectedPlaceId: value,
+                  modalVisible: true,
+                  showActivityIndicator: true
+                });
+                this.getServiceCentres(value);
+              } else {
+                this.setState({
+                  selectedPlaceId: value
+                });
+              }
             }}
           >
             {places}
@@ -239,7 +262,7 @@ class Home extends Component<Props, HomeState> {
               fontSize: 18
             }}
           >
-            {"Select your location from above drop down"}
+            {displayText}
           </Text>
         )}
       </View>
