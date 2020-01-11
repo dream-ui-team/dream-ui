@@ -469,9 +469,9 @@ export async function getServiceCentresByLocationId(locationId: string) {
     });
 }
 
-export async function getCostSheet(partnerId: string) {
+export async function getCostSheet(partnerId: string,serviceType:string) {
   const token = await getOauthAccessToken();
-  return fetch(`${urls.Base}/partners/${partnerId}/services/1/costsheets`, {
+  return fetch(`${urls.Base}/partners/${partnerId}/services/${serviceType}/costsheets`, {
     method: "GET",
     headers: {
       Accept: "application/json",

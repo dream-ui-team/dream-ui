@@ -80,17 +80,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 4
   },
-  pickerStyle: {
-    height: 50,
-    width: "90%",
-    color: "#344953",
-    justifyContent: "center"
-  },
   searchInput: {
     padding: 10,
     borderColor: "#CCC",
     borderWidth: 1,
     backgroundColor: "#F4F4F4"
+  },
+  pickerStyle: {
+    height: 50,
+    width: "90%",
+    color: "#344953",
+    justifyContent: "center"
   },
   pickerContainer: {
     display: "flex",
@@ -98,9 +98,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#CCCCCC",
-    margin: 1,
+    margin: 10,
     backgroundColor: "#F4F4F4",
-    alignItems: "center"
+    alignItems: "center",
+    fontSize: 16,
+    marginLeft: 40,
+    marginRight: 40
   },
   serviceDetailsText: {
     color: "#000000",
