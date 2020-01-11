@@ -6,8 +6,9 @@ import configureStore from "./src/redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import * as Font from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
-import { Platform, StatusBar } from "react-native";
+import { Platform, StatusBar, View, Text } from "react-native";
 import { colors } from "./src/constants";
+
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -25,6 +26,13 @@ export default class App extends Component {
     this.setState({ isReady: true });
   }
   render() {
+    if (!this.state.isReady) {
+      return (
+        <View>
+          <Text> Still loading </Text>
+        </View>
+      );
+    }
     return (
       <SafeAreaView
         style={{

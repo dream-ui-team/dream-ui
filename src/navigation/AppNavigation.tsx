@@ -20,6 +20,7 @@ import AddAddress from "../screens/AppScreens/AddressDetails/AddAddress";
 import ServiceCenterDetails from "../screens/AppScreens/Home/ServiceCenterDetails";
 import OrderRequest from "../screens/AppScreens/Orders/OrderRequest";
 import OrderSummary from "../screens/AppScreens/Orders/OrderSummary";
+import UserProfileDetails from "../screens/AppScreens/MyProfileDetails/UserProfileDetails";
 
 const { width } = Dimensions.get("window");
 
@@ -35,8 +36,9 @@ const MainStack = createStackNavigator(
     ServiceCenterDetails: ServiceCenterDetails,
     OrderRequest: OrderRequest,
     OrderSummary: OrderSummary,
-    AddVehicle:AddVehicle,
-    VehicleDetails:VehicleDetails
+    AddVehicle: AddVehicle,
+    UserProfileDetails: UserProfileDetails,
+    VehicleDetails: VehicleDetails
   },
   {
     initialRouteName: "Home",

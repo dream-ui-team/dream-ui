@@ -1,17 +1,19 @@
 import React, { Component } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { Container,
-Header,
-Content,
-Card,
-CardItem,
-Body,
-Text,
-Left,
-Right,
-Button,
-Title,
-Icon } from 'native-base';
+import {
+  Container,
+  Header,
+  Content,
+  Card,
+  CardItem,
+  Body,
+  Text,
+  Left,
+  Right,
+  Button,
+  Title,
+  Icon
+} from "native-base";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 //import { Header } from "../../../components";
 import { AsyncStorage } from "react-native";
@@ -24,7 +26,7 @@ interface Props {
 class AccountDetails extends Component<Props, { myProfileData }> {
   constructor(props) {
     super(props);
-      this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
+    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     this.state = {
       myProfileData: []
     };
@@ -51,51 +53,59 @@ class AccountDetails extends Component<Props, { myProfileData }> {
     const { navigation } = this.props;
     return (
       <Container>
-      <Header>
-        <Left>
-          <Button transparent onPress={this.handleBackButtonClick}>
-            <Icon name="arrow-back" size={24} />
-          </Button>
-        </Left>
-        <Body>
-          <Title styles={{paddingLeft:15}}>My Account details</Title>
-        </Body>
-        <Right />
-      </Header>
-       <Content>
-         <Card>
-           <CardItem>
-             <Icon active name="person" />
-             <Text>My Profile</Text>
-             <Right>
-               <Icon name="arrow-forward"   onPress={() =>
-                   navigation.navigate("MyProfileDetails", {
-                     values: this.state.myProfileData
-                   })
-                 }/>
-             </Right>
+        <Header>
+          <Left>
+            <Button transparent onPress={this.handleBackButtonClick}>
+              <Icon name="arrow-back" size={24} />
+            </Button>
+          </Left>
+          <Body>
+            <Title styles={{ paddingLeft: 15 }}>My Account details</Title>
+          </Body>
+          <Right />
+        </Header>
+        <Content>
+          <Card>
+            <CardItem>
+              <Icon active name="person" />
+              <Text>My Profile</Text>
+              <Right>
+                <Icon
+                  name="arrow-forward"
+                  onPress={() => navigation.navigate("UserProfileDetails")}
+                />
+              </Right>
             </CardItem>
           </Card>
+
           <Card>
             <CardItem>
               <Icon active name="home" />
               <Text>My Address</Text>
               <Right>
-                <Icon name="arrow-forward"    onPress={() => this.props.navigation.navigate("AddressDetails")}/>
+                <Icon
+                  name="arrow-forward"
+                  onPress={() =>
+                    this.props.navigation.navigate("AddressDetails")
+                  }
+                />
               </Right>
-             </CardItem>
-           </Card>
-           <Card>
-             <CardItem>
-               <Icon active name="car" />
-               <Text>My Vehicles</Text>
-               <Right>
-                 <Icon name="arrow-forward"   onPress={() => navigation.navigate("VehicleDetails")}/>
-               </Right>
-              </CardItem>
-            </Card>
-       </Content>
-     </Container>
+            </CardItem>
+          </Card>
+          <Card>
+            <CardItem>
+              <Icon active name="car" />
+              <Text>My Vehicles</Text>
+              <Right>
+                <Icon
+                  name="arrow-forward"
+                  onPress={() => navigation.navigate("VehicleDetails")}
+                />
+              </Right>
+            </CardItem>
+          </Card>
+        </Content>
+      </Container>
     );
   }
 }

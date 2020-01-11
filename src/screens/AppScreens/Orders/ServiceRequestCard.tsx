@@ -1,18 +1,5 @@
 import React, { Component } from "react";
-import { View } from "react-native";
-import {
-  Container,
-  Header,
-  Content,
-  Card,
-  CardItem,
-  Body,
-  Text,
-  Left,
-  Right,
-  Button,
-  Title
-} from "native-base";
+import { Card, CardItem, Body, Text } from "native-base";
 class ServiceRequestCard extends Component<Props, {}> {
   render() {
     return (

@@ -2,14 +2,12 @@ import React, { Component } from "react";
 import {
   View,
   KeyboardAvoidingView,
-  Platform,
   ScrollView,
   AsyncStorage,
-  Alert,
-  Text
+  Alert
 } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
-
+import { Container, Content, Card, CardItem, Text, Body } from "native-base";
 import { Formik } from "formik";
 import { Header } from "../../../components";
 import { Input, Button } from "../../../components";
@@ -36,7 +34,8 @@ class MyProfileDetails extends Component<Props, {}> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      values: this.props.navigation.getParam("values", "NO-ID")
+      values: this.props.navigation.getParam("values", "NO-ID"),
+      editInfo: false
     };
   }
 
@@ -50,9 +49,11 @@ class MyProfileDetails extends Component<Props, {}> {
       values.emailAddress
     ).then(res => {
       if (res["errorCode"] == undefined || res["errorCode"] == "") {
-        //let userToken = `${values.username}${values.password}`;
         AsyncStorage.setItem("userToken", JSON.stringify(values));
         Alert.alert("Successfully updated user information");
+        this.setState({
+          editInfo: false
+        });
         this.props.navigation.navigate("AppStack");
       } else {
         Alert.alert(res["errorMessage"]);
@@ -75,77 +76,110 @@ class MyProfileDetails extends Component<Props, {}> {
           leftButtonPress={() => this.props.navigation.openDrawer()}
           rightButtonPress={() => this.handleLogout()}
         />
-        <KeyboardAvoidingView behavior="padding">
-          <ScrollView bounces={false}>
-            <Formik
-              initialValues={{
-                firstName: `${this.state.values.firstName}`,
-                lastName: `${this.state.values.lastName}`,
-                emailAddress: `${this.state.values.emailAddress}`,
-                mobileNumber: `${this.state.values.mobileNumber}`,
-                userId: `${this.state.values.userId}`
-              }}
-              onSubmit={values => this.handleProfileUpdate(values)}
-            >
-              {props => {
-                return (
-                  <View>
-                    <View style={styles.inputContainer}>
-                      <Text>First name:</Text>
-                      <Input
-                        placeholder="First name"
-                        value={props.values.firstName}
-                        onChangeText={props.handleChange("firstName")}
-                        //onBlur={props.handleBlur("firstName")}
-                        error={
-                          props.touched.firstName && props.errors.firstName
-                        }
-                      />
-                      <Text>Last name:</Text>
-                      <Input
-                        placeholder="Last name"
-                        value={props.values.lastName}
-                        onChangeText={props.handleChange("lastName")}
-                        //onBlur={props.handleBlur("lastName")}
-                        error={props.touched.lastName && props.errors.lastName}
-                      />
-                      <Text>Email:</Text>
-                      <Input
-                        placeholder="Email"
-                        value={props.values.emailAddress}
-                        onChangeText={props.handleChange("emailAddress")}
-                        //onBlur={props.handleBlur("email")}
-                        error={
-                          props.touched.emailAddress &&
-                          props.errors.emailAddress
-                        }
-                      />
-                      <Text>mobile Number:</Text>
-                      <Input
-                        placeholder="Mobille number"
-                        value={props.values.mobileNumber}
-                        onChangeText={props.handleChange("mobileNumber")}
-                        //onBlur={props.handleBlur("mobileNum")}
-                        error={
-                          props.touched.mobileNumber &&
-                          props.errors.mobileNumber
-                        }
-                      />
+        {this.state.editInfo ? (
+          <KeyboardAvoidingView behavior="padding">
+            <ScrollView bounces={false}>
+              <Formik
+                initialValues={{
+                  firstName: `${this.state.values.firstName}`,
+                  lastName: `${this.state.values.lastName}`,
+                  emailAddress: `${this.state.values.emailAddress}`,
+                  mobileNumber: `${this.state.values.mobileNumber}`,
+                  userId: `${this.state.values.userId}`
+                }}
+                onSubmit={values => this.handleProfileUpdate(values)}
+              >
+                {props => {
+                  return (
+                    <View>
+                      <View style={styles.inputContainer}>
+                        <Text>First name:</Text>
+                        <Input
+                          placeholder="First name"
+                          value={props.values.firstName}
+                          onChangeText={props.handleChange("firstName")}
+                          //onBlur={props.handleBlur("firstName")}
+                          error={
+                            props.touched.firstName && props.errors.firstName
+                          }
+                        />
+                        <Text>Last name:</Text>
+                        <Input
+                          placeholder="Last name"
+                          value={props.values.lastName}
+                          onChangeText={props.handleChange("lastName")}
+                          //onBlur={props.handleBlur("lastName")}
+                          error={
+                            props.touched.lastName && props.errors.lastName
+                          }
+                        />
+                        <Text>Email:</Text>
+                        <Input
+                          placeholder="Email"
+                          value={props.values.emailAddress}
+                          onChangeText={props.handleChange("emailAddress")}
+                          //onBlur={props.handleBlur("email")}
+                          error={
+                            props.touched.emailAddress &&
+                            props.errors.emailAddress
+                          }
+                        />
+                        <Text>mobile Number:</Text>
+                        <Input
+                          placeholder="Mobille number"
+                          value={props.values.mobileNumber}
+                          onChangeText={props.handleChange("mobileNumber")}
+                          //onBlur={props.handleBlur("mobileNum")}
+                          error={
+                            props.touched.mobileNumber &&
+                            props.errors.mobileNumber
+                          }
+                        />
 
-                      <Button
-                        text="Update my profile"
-                        onPress={props.handleSubmit}
-                      />
+                        <Button
+                          text="Update my profile"
+                          onPress={props.handleSubmit}
+                        />
+                      </View>
                     </View>
-                  </View>
-                );
+                  );
+                }}
+              </Formik>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        ) : (
+          <View>
+            <UserInfoComp
+              firstName={this.state.values.firstName}
+              lastName={this.state.values.lastName}
+              emailAddress={this.state.values.emailAddress}
+              mobileNumber={this.state.values.mobileNumber}
+            />
+            <Button
+              title="Edit my info"
+              onPress={() => {
+                this.setState({
+                  editInfo: true
+                });
               }}
-            </Formik>
-          </ScrollView>
-        </KeyboardAvoidingView>
+            />
+          </View>
+        )}
       </View>
     );
   }
 }
+
+const UserInfoComp = props => {
+  return (
+    <View>
+      <Text> Profile information </Text>
+      <Text>First name: {props.firstName}</Text>
+      <Text>Last name: {props.lastName}</Text>
+      <Text>Mobile number: {props.mobileNumber}</Text>
+      <Text>Email: {props.emailAddress}</Text>
+    </View>
+  );
+};
 
 export default MyProfileDetails;
