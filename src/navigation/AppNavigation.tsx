@@ -15,7 +15,6 @@ import Login from "../screens/AuthScreens/Login";
 import AuthLoading from "../screens/AuthLoading";
 import Registration from "../screens/AuthScreens/Registration";
 import AccountDetails from "../screens/AppScreens/AccountDetails";
-import MyProfileDetails from "../screens/AppScreens/MyProfileDetails";
 import AddAddress from "../screens/AppScreens/AddressDetails/AddAddress";
 import ServiceCenterDetails from "../screens/AppScreens/Home/ServiceCenterDetails";
 import OrderRequest from "../screens/AppScreens/Orders/OrderRequest";
@@ -31,7 +30,6 @@ const MainStack = createStackNavigator(
     // key is used in navigation.navigate() function
     // key: component-name
     Home: Home,
-    MyProfileDetails: MyProfileDetails,
     AddAddress: AddAddress,
     ServiceCenterDetails: ServiceCenterDetails,
     OrderRequest: OrderRequest,
