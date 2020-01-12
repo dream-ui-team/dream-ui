@@ -163,7 +163,7 @@ class AddVehicle extends Component<Props, State> {
                       <View style={styles1.midContainer}>
                         <Text
                           style={styles1.headerTitle}
-                        >{`Vehicle details`}</Text>
+                        >{`Vehicle Details`}</Text>
                       </View>
                     </View>
 

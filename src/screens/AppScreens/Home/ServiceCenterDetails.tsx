@@ -4,14 +4,13 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
-  Text,
   TouchableOpacity,
   Linking,
   Picker
 } from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { connect } from "react-redux";
-import { Header, CommonButton } from "../../../components";
+import {  CommonButton } from "../../../components";
 import styles from "./styles";
 import { AvatarItem } from "../../../components";
 import {
@@ -23,45 +22,84 @@ import {
 import SearchInput, { createFilter } from "react-native-search-filter";
 import { colors } from "../../../constants";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import {
+  Container,
+  Header,
+  Content,
+  Card,
+  CardItem,
+  Body,
+  Text,
+  Left,
+  Right,
+  Button,
+  Title
+} from "native-base";
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>;
 }
+interface PartnerDetails {
+  name: string;
+  emailAddress: string;
+  alternateMobileNumber: number;
+  address: string;
+  mobileNumber: number;
+}
 
-class ServiceCenterDetails extends Component {
+interface PartnerDetailsResponse {
+  partner:PartnerDetails;
+}
+interface ServiceCenterDetailsState {
+  partnerDetailsResponse:PartnerDetailsResponse;
+  serviceType:string;
+  serviceName:string;
+  url:boolean;
+  enableButton:boolean;
+  costSheetText:string;
+}
+
+class ServiceCenterDetails extends Component<Props, ServiceCenterDetailsState> {
   constructor(props) {
     super(props);
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     this.getServiceCentres = this.getServiceCentres.bind(this);
-    (this.state = {
-      locationId: "",
-      locations: [],
-      pickerList: [],
-      serviceCentres: [],
-      serviceCentresBackup: [],
-      isNotNull: false,
-      searchTerm: "",
+    this.setData = this.setData.bind(this);
+      this.state = {
+      partnerDetailsResponse:{},
       costSheet: [],
-      url: false
-    }),
-      (this.state.serviceCentres = this.props.navigation.getParam(
-        "details",
-        "NULL"
-      ));
+      url: false,
+      serviceType:null,
+      serviceName:null,
+      enableButton:true,
+      costSheetText:'Please select service type to get costsheet',
+      serviceTypesArray:[{serviceName:null,value:null},{serviceName:'Vehicle Servicing',value:'1'},{serviceName:'Vehicle Repair',value:'2'},{serviceName:'Vehicle Wash',value:'3'}]
+      };
+      let partnerDetails = this.props.navigation.getParam(
+      "details",
+      "NULL"
+    );
+      this.state.partnerDetailsResponse=partnerDetails
   }
 
-  searchUpdated(term) {
-    this.state.serviceCentres = this.state.serviceCentresBackup;
-    this.setState({ searchTerm: term });
+  componentDidMount() {
+
   }
 
   getServiceCentres = () => {
-    getCostSheet(this.state.serviceCentres.partnerId)
+    getCostSheet(this.state.partnerDetailsResponse.partnerId,this.state.serviceType)
       .then(res => {
         this.setState({ costSheet: res });
         //Alert.alert(`${this.state.contacts.exists}`);
         console.log(this.state.costSheet);
+        if(res.status == '200') {
         this.setState({ url: true });
+      }
+      else {
+        this.setState({
+          costSheetText:'Either CostSheet is not available or service center does not offer selected service'
+        })
+      }
       })
       .catch(console.log);
   };
@@ -74,97 +112,139 @@ class ServiceCenterDetails extends Component {
   };
 
   handleBackButtonClick() {
-    this.props.navigation.navigate("AppStack");
+    this.props.navigation.navigate("Home");
     return true;
+  };
+  setData = (value,index)=>{
+    this.setState({ serviceType: value ,
+    serviceName:this.state.serviceTypesArray[index].serviceName,
+    url:false
+  });
+    if(this.state.serviceTypesArray[index].serviceName!=null){
+      this.state.enableButton=false;
+      this.setState({
+        costSheetText:''
+      });
+    }
+    else {
+      this.state.enableButton=true;
+      this.setState({
+        costSheetText:'Please select service type to get costsheet'
+      });
+    }
   }
 
   render() {
+    const { partnerDetailsResponse } = this.state;
+    let serviceTypes = [];
+    /* Pushing first value*/
+    serviceTypes.push(
+      <Picker.Item
+        key={"NULL"}
+        label={"Select a Service Type"}
+        value={"null"}
+      />
+    );
+    serviceTypes.push(
+      <Picker.Item
+        key={"1"}
+        label={"Vehicle Servicing"}
+        value={"1"}
+      />
+    );
+    serviceTypes.push(
+      <Picker.Item
+        key={"2"}
+        label={"Vehicle Repair"}
+        value={"2"}
+      />
+    );
+    serviceTypes.push(
+      <Picker.Item
+        key={"3"}
+        label={"Vehicle Wash"}
+        value={"3"}
+      />
+    );
+
     return (
-      <View style={styles.container}>
-        <View style={styles1.profileContainer}>
-          <View style={styles1.leftContainer}>
-            <TouchableOpacity
-              style={styles1.iconButton}
-              onPress={this.handleBackButtonClick}
-            >
+      <Container>
+        <Header>
+          <Left>
+            <Button transparent onPress={this.handleBackButtonClick}>
               <Icon name="arrow-back" size={24} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles1.midContainer}>
-            <Text style={styles1.headerTitle}>{`Service Center Details`}</Text>
-          </View>
+            </Button>
+          </Left>
+          <Body>
+            <Title>Service Center Detail</Title>
+          </Body>
+          <Right />
+        </Header>
+        <Content>
+        <Card>
+          <CardItem header>
+            <Text>Service Center Details</Text>
+          </CardItem>
+          <CardItem>
+            <Body>
+              <Text>Name: {partnerDetailsResponse.name}</Text>
+              <Text>Address: {partnerDetailsResponse.address}</Text>
+              <Text>
+                Contact number: {partnerDetailsResponse.mobileNumber}
+              </Text>
+              <Text>
+                Alternate contact number:{" "}
+                {partnerDetailsResponse.alternateMobileNumber}
+              </Text>
+              <Text>
+                Email: {partnerDetailsResponse.emailAddress}
+              </Text>
+            </Body>
+          </CardItem>
+        </Card>
+        <Card>
+          <CardItem header>
+            <Text>{"Services offered by service center :"}</Text>
+          </CardItem>
+            <View style={styles.pickerContainer}>
+          <Picker
+            style={styles.pickerStyle}
+            selectedValue={this.state.serviceType}
+            onValueChange={(value, index) => {
+              this.setData(value,index)
+            }}
+          >
+
+            {serviceTypes}
+          </Picker>
         </View>
-        <View style={styles.homeContainer}>
-          <View style={styles.homeContainerRow}>
-            <Text style={styles.serviceDetailsText}>
-              {this.state.serviceCentres.name}
-            </Text>
-          </View>
-          <View style={styles.homeContainerRow}>
-            <Text style={styles.serviceDetailsText}>
-              {this.state.serviceCentres.address}
-            </Text>
-          </View>
-          <View style={styles.homeContainerRow}>
-            <Text style={styles.serviceDetailsText}>
-              {this.state.serviceCentres.mobileNumber}
-            </Text>
-          </View>
-          <View style={styles.homeContainerRow}>
-            <Text style={styles.serviceDetailsText}>
-              {this.state.serviceCentres.alternateMobileNumber}
-            </Text>
-          </View>
-          <View style={styles.homeContainerRow}>
-            <Text style={styles.serviceDetailsText}>
-              {this.state.serviceCentres.emailAddress}
-            </Text>
-          </View>
-        </View>
-        <Text></Text>
-        <View style={styles.homeContainer}>
-          <View style={styles.homeContainerRow}>
-            <Text style={{ marginTop: 6, marginBottom: 4 }}>
-              {"Services offered by service center :"}
-            </Text>
-          </View>
-          <View style={styles.pickerContainer}>
-            <Picker
-              style={styles.pickerStyle}
-              selectedValue={this.state.locationId}
-            >
-              <Picker.Item label={"Vehicle Servicing"} value={1} />
-              <Picker.Item label={"Vehicle Repair"} value={2} />
-              <Picker.Item label={"Vehicle Wash"} value={3} />
-            </Picker>
-          </View>
-        </View>
-        <Text></Text>
-        <View style={styles.homeContainer}>
-          <View style={styles.homeContainerRow}>
-            <View style={styles.updateButton}>
-              <TouchableOpacity
-                style={styles.buttonStyle}
-                onPress={() => this.getServiceCentres()}
-              >
-                <Text style={styles.buttonTextStyle}>{"See Costsheet"}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={styles.homeContainerRow}>
-            {this.state.url ? (
+        </Card>
+        <Card>
+          <CardItem header>
+            <Text>Cost sheet for {this.state.serviceName}:</Text>
+          </CardItem>
+          <CardItem>
+            <Body>
+            <TouchableOpacity disabled={this.state.enableButton}
+             style={styles.buttonStyle}
+             onPress={() => this.getServiceCentres()}
+           >
+           <Text style={styles.buttonTextStyle}>{"Get Costsheet"}</Text>
+           </TouchableOpacity>
+           {this.state.url ? (
               <Text
                 style={{ color: "blue", marginTop: 20, fontSize: 15 }}
                 onPress={() => Linking.openURL(this.state.costSheet.url)}
-              >
-                Download Costsheet
+              >  Download Costsheet
               </Text>
             ) : (
-              <Text style={{ marginTop: 20, fontSize: 15 }}>{"No Data"}</Text>
+              <Text style={{ marginTop: 20, fontSize: 15 }}>{this.state.costSheetText}</Text>
             )}
-          </View>
-        </View>
-      </View>
+            </Body>
+          </CardItem>
+        </Card>
+        </Content>
+      </Container>
     );
   }
 }
