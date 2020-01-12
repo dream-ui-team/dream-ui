@@ -11,16 +11,15 @@ import AddressDetails from "../screens/AppScreens/AddressDetails";
 import VehicleDetails from "../screens/AppScreens/VehicleDetails";
 import AddVehicle from "../screens/AppScreens/VehicleDetails/AddVehicle";
 import SideBar from "../screens/AppScreens/SideBar";
-import Login from "../screens/AuthScreens/Login";
 import AuthLoading from "../screens/AuthLoading";
-import Registration from "../screens/AuthScreens/Registration";
+import Registration from "../screens/AuthScreens/Registration/Register";
 import AccountDetails from "../screens/AppScreens/AccountDetails";
 import AddAddress from "../screens/AppScreens/AddressDetails/AddAddress";
 import ServiceCenterDetails from "../screens/AppScreens/Home/ServiceCenterDetails";
 import OrderRequest from "../screens/AppScreens/Orders/OrderRequest";
 import OrderSummary from "../screens/AppScreens/Orders/OrderSummary";
 import UserProfileDetails from "../screens/AppScreens/MyProfileDetails/UserProfileDetails";
-
+import LoginPage from "../screens/AuthScreens/Login/Login";
 const { width } = Dimensions.get("window");
 
 // this stack will store every page in app
@@ -48,11 +47,11 @@ const MainStack = createStackNavigator(
 // user authentication
 const AuthStack = createStackNavigator(
   {
-    Login: Login,
+    LoginPage: LoginPage,
     Registration: Registration
   },
   {
-    initialRouteName: "Login",
+    initialRouteName: "LoginPage",
     headerMode: "none"
   }
 );
