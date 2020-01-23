@@ -1,10 +1,21 @@
 import React, { Component } from "react";
-import { View, FlatList,AsyncStorage,Text,StyleSheet, Button, Alert  } from "react-native";
+import {
+  View,
+  FlatList,
+  AsyncStorage,
+  Text,
+  StyleSheet,
+  Button,
+  Alert
+} from "react-native";
 import { NavigationScreenProp, NavigationState } from "react-navigation";
 import { Header } from "../../../components";
 import styles from "./styles";
 import { CommonButton } from "../../../components";
-import { logoutUserService, getAllUserVehicles } from "../../../redux/services/user";
+import {
+  logoutUserService,
+  getAllUserVehicles
+} from "../../../redux/services/user";
 import { userDeleteVehicleService } from "../../../redux/services/VehicleService";
 import { Vehicle } from "../../../redux/model/vehicle";
 
@@ -20,7 +31,7 @@ interface State {
   page: number;
   limit: number;
   values: string;
-  vehicles: Array<Object>;
+  vehicles: [];
   refresh: boolean;
 }
 
@@ -32,40 +43,29 @@ class VehicleDetails extends Component<Props, State> {
     this.state = {
       page: 1,
       limit: 20,
-      values:"",
+      values: "",
       vehicles: [],
       refresh: true
     };
   }
 
   componentDidMount() {
-    console.log("mounted");
-    let values=
-      [
-        {
-      'model':'Maruti Swift Dezire',
-      'registrationNumber':'5645646',
-      'manufacturerName': 'Maruti',
-      'vehicleTypeCode': 2
-        }
-      ]
-
-    //this.setState({ vehicles: values });
-   //this.setState({values:values});
-    AsyncStorage.getItem('userToken').then((value) =>{
-        this.setState({values:JSON.parse(value)});
-        }).then(res => {
-          console.log("User Id "+this.state.values.userId);
-          getAllUserVehicles(this.state.values.userId)
-            .then(res =>{
-                    this.setState({ vehicles: JSON.parse(res),
-                      refresh: !this.state.refresh
-                     });
-                    console.log(this.state.vehicles);
-
-                  })
-            .catch(console.log)
-        });
+    AsyncStorage.getItem("userToken")
+      .then(value => {
+        this.setState({ values: JSON.parse(value) });
+      })
+      .then(res => {
+        console.log("User Id " + this.state.values.userId);
+        getAllUserVehicles(this.state.values.userId)
+          .then(res => {
+            this.setState({
+              vehicles: JSON.parse(res),
+              refresh: !this.state.refresh
+            });
+            console.log(this.state.vehicles);
+          })
+          .catch(console.log);
+      });
   }
 
   addNewVehicle(vehicle: Vehicle) {
@@ -103,7 +103,7 @@ class VehicleDetails extends Component<Props, State> {
     });
   };
 
-  handleUpdate = (vehicle) => {
+  handleUpdate = vehicle => {
     const { navigation } = this.props;
     this.props.navigation.navigate("AddVehicle", {
       manufacturerName: vehicle.manufacturerName,
@@ -114,9 +114,9 @@ class VehicleDetails extends Component<Props, State> {
       vehicleTypeCode: vehicle.vehicleTypeCode,
       buttonText: "Update Vehicle",
       updateVehicle: this.updateVehicle
-      })
+    });
   };
-  handleDelete = (vehicle) => {
+  handleDelete = vehicle => {
     const { navigation } = this.props;
     userDeleteVehicleService(this.state.values.userId, vehicle.vehicleId)
       .then(res => {
@@ -144,56 +144,67 @@ class VehicleDetails extends Component<Props, State> {
           leftButtonPress={() => navigation.openDrawer()}
           rightButtonPress={() => this.handleLogout()}
         />
-        {this.state.vehicles.length>0 ? (
-        <FlatList
-          data={this.state.vehicles}
-          extraData={this.state.refresh}
-          keyExtractor={(x, i) => i.toString()}
-          renderItem={({ item }) =>
-          <View style={styles.vehicleContainer}>
-            <View style={styles.vehicleContainerRow}>
-              <View style={styles.label}>
-                <Text style={styles.text}>Model</Text>
+        {this.state.vehicles.length > 0 ? (
+          <FlatList
+            data={this.state.vehicles}
+            extraData={this.state.refresh}
+            keyExtractor={(x, i) => i.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.vehicleContainer}>
+                <View style={styles.vehicleContainerRow}>
+                  <View style={styles.label}>
+                    <Text style={styles.text}>Model</Text>
+                  </View>
+                  <View style={styles.data}>
+                    <Text style={styles.text}>{item.model}</Text>
+                  </View>
+                </View>
+                <View style={styles.vehicleContainerRow}>
+                  <View style={styles.label}>
+                    <Text style={styles.text}>Registration Nr</Text>
+                  </View>
+                  <View style={styles.data}>
+                    <Text style={styles.text}>{item.registrationNumber}</Text>
+                  </View>
+                </View>
+                <View style={styles.vehicleContainerRow}>
+                  <View style={styles.label}>
+                    <Text style={styles.text}>Manufacturer</Text>
+                  </View>
+                  <View style={styles.data}>
+                    <Text style={styles.text}>{item.manufacturerName}</Text>
+                  </View>
+                </View>
+                <View style={styles.vehicleContainerRow}>
+                  <View style={styles.label}>
+                    <Text style={styles.text}>Type</Text>
+                  </View>
+                  <View style={styles.data}>
+                    <Text style={styles.text}>{item.vehicleTypeCode}</Text>
+                  </View>
+                </View>
+                <View style={styles.vehicleContainerRow}>
+                  <View style={styles.updateButton}>
+                    <CommonButton
+                      text="Update"
+                      onPress={() => this.handleUpdate(item)}
+                    />
+                  </View>
+                  <View style={styles.updateButton}>
+                    <CommonButton
+                      text="Delete"
+                      onPress={() => this.handleDelete(item)}
+                    />
+                  </View>
+                </View>
               </View>
-              <View style={styles.data}>
-                <Text style={styles.text}>{item.model}</Text>
-              </View>
-            </View>
-            <View style={styles.vehicleContainerRow}>
-              <View style={styles.label}>
-                <Text style={styles.text}>Registration Nr</Text>
-              </View>
-              <View style={styles.data}>
-                <Text style={styles.text}>{item.registrationNumber}</Text>
-              </View>
-            </View>
-            <View style={styles.vehicleContainerRow}>
-              <View style={styles.label}>
-                <Text style={styles.text}>Manufacturer</Text>
-              </View>
-              <View style={styles.data}>
-                <Text style={styles.text}>{item.manufacturerName}</Text>
-              </View>
-            </View>
-            <View style={styles.vehicleContainerRow}>
-              <View style={styles.label}>
-                <Text style={styles.text}>Type</Text>
-              </View>
-              <View style={styles.data}>
-                <Text style={styles.text}>{item.vehicleTypeCode}</Text>
-              </View>
-            </View>
-            <View style={styles.vehicleContainerRow}>
-              <View style={styles.updateButton}>
-                <CommonButton text="Update" onPress={()=>this.handleUpdate(item)}/>
-              </View>
-              <View style={styles.updateButton}>
-                <CommonButton text="Delete" onPress={()=>this.handleDelete(item)}/>
-              </View>
-            </View>
+            )}
+          />
+        ) : (
+          <View>
+            <Text>Please Add your vehicle</Text>
           </View>
-        }/>
-      ):(<View><Text>Please Add your vehicle</Text></View>)}
+        )}
         <View style={styles1.container}>
           <Button
             title="Add New Vehicle"
@@ -218,7 +229,6 @@ const styles1 = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#68a0cf",
     backgroundColor: "white"
-  },
-
+  }
 });
 export default VehicleDetails;
